@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,64 +31,75 @@ class FundRequestService {
     }
 
     /**
+     * ListAll FundRequest
+     *
+     * @param Page $page
+     * @return RestCollection
+     */
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/fund-requests", $page->getQueryString(), array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
+    }
+
+    /**
      * Send FundRequest
      *
-     * @param SendFundRequestForm $form
-     * @return MfaProcess
+     * @param mixed $form
+     * @return Attempt
      */
-    public function send(SendFundRequestForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/fund-requests/" . $form->getId() . "/send", $form->toJson(), "", array(), function($value){ return MfaProcess::fromArray($value); }, $this->auth);
+    public function send($form) {
+        return Http::Post("/" . Sdk::VERSION . "/fund-requests/" . $form['id'] . "/send", json_encode($form), "", array(), function($value){ return Attempt::fromArray($value); }, $this->auth);
     }
 
     /**
      * Cancel FundRequest
      *
-     * @param CancelFundRequestForm $form
+     * @param string $form
      * @return FundRequest
      */
-    public function cancel(CancelFundRequestForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/fund-requests/" . $form->getId() . "/cancel", $form->toJson(), "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
+    public function cancel($form) {
+        return Http::Post("/" . Sdk::VERSION . "/fund-requests/" . $form . "/cancel", null, "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
     }
 
     /**
      * Create FundRequest
      *
-     * @param CreateFundRequestForm $form
+     * @param mixed $form
      * @return FundRequest
      */
-    public function create(CreateFundRequestForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/fund-requests", $form->toJson(), "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
+    public function create($form) {
+        return Http::Post("/" . Sdk::VERSION . "/fund-requests", json_encode($form), "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
     }
 
     /**
      * Get FundRequest
      *
-     * @param string $id
+     * @param string $form
      * @return FundRequest
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/fund-requests/" . $id, "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/fund-requests/" . $form, "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List FundRequest
+     * ListAll FundRequest
      *
-     * @param ListForm $form
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/fund-requests", $qs, array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update FundRequest
      *
-     * @param UpdateFundRequestForm $form
+     * @param mixed $form
      * @return FundRequest
      */
-    public function update(UpdateFundRequestForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/fund-requests/" . $form->getId(), $form->toJson(), "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/fund-requests/" . $form['id'], json_encode($form), "", array(), function($value){ return FundRequest::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

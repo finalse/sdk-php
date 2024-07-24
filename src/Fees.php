@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ use JsonSerializable;
 
 class Fees implements JsonSerializable  {
 
-    /** @var FeesPayer */
+    /** @var FeesPayer | null */
     protected $payer ;
 
     /** @var FeesValue */
@@ -35,11 +35,11 @@ class Fees implements JsonSerializable  {
 
     /**
      * Fees constructor
-     * @param FeesPayer $payer
+     * @param FeesPayer | null $payer
      * @param FeesValue $value
      * @param Amount $amount
      */
-    function __construct(FeesPayer $payer, FeesValue $value, Amount $amount) {
+    function __construct($payer = null, FeesValue $value, Amount $amount) {
         $this->payer = $payer;
         $this->value = $value;
         $this->amount = $amount;
@@ -48,7 +48,7 @@ class Fees implements JsonSerializable  {
     /**
      * Getter of the field 'payer'.
      *
-     * @return FeesPayer
+     * @return FeesPayer | null
      */
     public function getPayer() {
         return $this->payer;
@@ -82,11 +82,11 @@ class Fees implements JsonSerializable  {
     /**
      * Immutable update. Return a new Fees where the field 'payer' has been updated with the value passed as parameter.
      *
-     * @param FeesPayer $payer
+     * @param FeesPayer | null $payer
      * @return Fees
      */
-    public function withPayer(FeesPayer $payer) {
-        assert($this->payer != null, "In class Fees the param 'payer' of type FeesPayer can not be null");
+    public function withPayer($payer) {
+        assert($this->payer != null, "In class Fees the param 'payer' of type FeesPayer | null can not be null");
         return new Fees($payer, $this->value, $this->amount);
     }
 
@@ -130,7 +130,7 @@ class Fees implements JsonSerializable  {
      * @return Fees
      */
     public static function fromArray(array $array) {
-        return new Fees(FeesPayer::fromString($array['payer']),
+        return new Fees((isset($array['payer']) ? FeesPayer::fromString($array['payer']) : null),
                         FeesValue::fromArray($array['value']),
                         Amount::fromArray($array['amount']));
     }
@@ -161,7 +161,7 @@ class Fees implements JsonSerializable  {
     public function toArray() {
         return array_filter(
             array(
-                'payer' => ((string) $this->payer),
+                'payer' => ($this->payer !== null ? ((string) $this->payer) : null),
                 'value' => ($this->value !== null ? $this->value->toArray() : null),
                 'amount' => ($this->amount !== null ? $this->amount->toArray() : null),
             )

@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -70,14 +70,6 @@ class FeesPayer implements JsonSerializable {
             if($s->value === $value) return $s;
         }
         return null;
-    }
-
-    public function isNotReceiver() {
-        return $this->value !== "Receiver";
-    }
-
-    public function isNotSender() {
-        return $this->value !== "Sender";
     }
 
     public function isReceiver() {

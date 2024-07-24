@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,44 +31,55 @@ class TransferService {
     }
 
     /**
-     * Create Transfer
+     * ListAll Transfer
      *
-     * @param CreateTransferForm $form
+     * @param Page $page
+     * @return RestCollection
+     */
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/transfers", $page->getQueryString(), array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
+    }
+
+    /**
+     * Initiate Transfer
+     *
+     * @param mixed $form
      * @return Transfer
      */
-    public function create(CreateTransferForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/transfers", $form->toJson(), "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
+    public function initiate($form) {
+        return Http::Post("/" . Sdk::VERSION . "/transfers/initiate", json_encode($form), "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
     }
 
     /**
      * Get Transfer
      *
-     * @param string $id
+     * @param string $form
      * @return Transfer
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/transfers/" . $id, "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/transfers/" . $form, "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List Transfer
+     * ListAll Transfer
      *
-     * @param ListForm $form
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/transfers", $qs, array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update Transfer
      *
-     * @param UpdateTransferForm $form
+     * @param mixed $form
      * @return Transfer
      */
-    public function update(UpdateTransferForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/transfers/" . $form->getId(), $form->toJson(), "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/transfers/" . $form['id'], json_encode($form), "", array(), function($value){ return Transfer::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

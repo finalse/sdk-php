@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,36 +24,64 @@ abstract class QuasiTransferStatus implements JsonSerializable  {
     /** @return string */
     public abstract function getType(); 
 
-    public function isWaiting() {
-        return $this->getType() === QuasiTransferStatusWaiting::Type;
+    public function isWaitingToStart() {
+        return $this->getType() === QuasiTransferStatusWaitingToStart::Type;
+    }
+
+    public function isStarting() {
+        return $this->getType() === QuasiTransferStatusStarting::Type;
+    }
+
+    public function isStarted() {
+        return $this->getType() === QuasiTransferStatusStarted::Type;
     }
 
     public function isProcessing() {
         return $this->getType() === QuasiTransferStatusProcessing::Type;
     }
 
-    public function isCompleted() {
-        return $this->getType() === QuasiTransferStatusCompleted::Type;
+    public function isFailure() {
+        return $this->getType() === QuasiTransferStatusFailure::Type;
     }
 
-    public function isCancelled() {
-        return $this->getType() === QuasiTransferStatusCancelled::Type;
+    public function isSuccessful() {
+        return $this->getType() === QuasiTransferStatusSuccessful::Type;
     }
 
-    public function isNotWaiting() {
-        return $this->getType() !== QuasiTransferStatusWaiting::Type; 
+    /** @return QuasiTransferStatusWaitingToStart | null */
+    public function asWaitingToStart() {
+        if($this->getType() == QuasiTransferStatusWaitingToStart::Type) return $this;
+        else return null;
     }
 
-    public function isNotProcessing() {
-        return $this->getType() !== QuasiTransferStatusProcessing::Type; 
+    /** @return QuasiTransferStatusStarting | null */
+    public function asStarting() {
+        if($this->getType() == QuasiTransferStatusStarting::Type) return $this;
+        else return null;
     }
 
-    public function isNotCompleted() {
-        return $this->getType() !== QuasiTransferStatusCompleted::Type; 
+    /** @return QuasiTransferStatusStarted | null */
+    public function asStarted() {
+        if($this->getType() == QuasiTransferStatusStarted::Type) return $this;
+        else return null;
     }
 
-    public function isNotCancelled() {
-        return $this->getType() !== QuasiTransferStatusCancelled::Type; 
+    /** @return QuasiTransferStatusProcessing | null */
+    public function asProcessing() {
+        if($this->getType() == QuasiTransferStatusProcessing::Type) return $this;
+        else return null;
+    }
+
+    /** @return QuasiTransferStatusFailure | null */
+    public function asFailure() {
+        if($this->getType() == QuasiTransferStatusFailure::Type) return $this;
+        else return null;
+    }
+
+    /** @return QuasiTransferStatusSuccessful | null */
+    public function asSuccessful() {
+        if($this->getType() == QuasiTransferStatusSuccessful::Type) return $this;
+        else return null;
     }
 
     /**
@@ -75,10 +103,12 @@ abstract class QuasiTransferStatus implements JsonSerializable  {
      */
     public static function fromArray(array $array) {
         $type = $array['_type'];
-        if($type === QuasiTransferStatusWaiting::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusWaiting::Variant)) return QuasiTransferStatusWaiting::fromArray($array);
+        if($type === QuasiTransferStatusWaitingToStart::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusWaitingToStart::Variant)) return QuasiTransferStatusWaitingToStart::fromArray($array);
+        else if($type === QuasiTransferStatusStarting::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusStarting::Variant)) return QuasiTransferStatusStarting::fromArray($array);
+        else if($type === QuasiTransferStatusStarted::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusStarted::Variant)) return QuasiTransferStatusStarted::fromArray($array);
         else if($type === QuasiTransferStatusProcessing::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusProcessing::Variant)) return QuasiTransferStatusProcessing::fromArray($array);
-        else if($type === QuasiTransferStatusCompleted::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusCompleted::Variant)) return QuasiTransferStatusCompleted::fromArray($array);
-        else if($type === QuasiTransferStatusCancelled::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusCancelled::Variant)) return QuasiTransferStatusCancelled::fromArray($array);
+        else if($type === QuasiTransferStatusFailure::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusFailure::Variant)) return QuasiTransferStatusFailure::fromArray($array);
+        else if($type === QuasiTransferStatusSuccessful::Type || str_ends_with('.' . $type, '.' . QuasiTransferStatusSuccessful::Variant)) return QuasiTransferStatusSuccessful::fromArray($array);
         else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'QuasiTransferStatus'" . " Unexpected '_type' = " . $type);
     }
 
@@ -98,5 +128,14 @@ abstract class QuasiTransferStatus implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

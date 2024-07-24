@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ use JsonSerializable;
 
 class QuasiTransferStatusProcessing extends QuasiTransferStatus implements JsonSerializable  {
 
-    /** @var string */
+    /** @var LocalizedText */
     protected $reason ;
 
 
@@ -33,16 +33,16 @@ class QuasiTransferStatusProcessing extends QuasiTransferStatus implements JsonS
 
     /**
      * QuasiTransferStatusProcessing constructor
-     * @param string $reason
+     * @param LocalizedText $reason
      */
-    function __construct($reason) {
+    function __construct(LocalizedText $reason) {
         $this->reason = $reason;
     }
 
     /**
      * Getter of the field 'reason'.
      *
-     * @return string
+     * @return LocalizedText
      */
     public function getReason() {
         return $this->reason;
@@ -58,10 +58,11 @@ class QuasiTransferStatusProcessing extends QuasiTransferStatus implements JsonS
     /**
      * Immutable update. Return a new QuasiTransferStatusProcessing where the field 'reason' has been updated with the value passed as parameter.
      *
-     * @param string $reason
+     * @param LocalizedText $reason
      * @return QuasiTransferStatusProcessing
      */
-    public function withReason($reason) {
+    public function withReason(LocalizedText $reason) {
+        assert($this->reason != null, "In class QuasiTransferStatusProcessing the param 'reason' of type LocalizedText can not be null");
         return new QuasiTransferStatusProcessing($reason);
     }
 
@@ -83,7 +84,7 @@ class QuasiTransferStatusProcessing extends QuasiTransferStatus implements JsonS
      * @return QuasiTransferStatusProcessing
      */
     public static function fromArray(array $array) {
-        return new QuasiTransferStatusProcessing($array['reason']);
+        return new QuasiTransferStatusProcessing(LocalizedText::fromArray($array['reason']));
     }
 
     /**
@@ -113,7 +114,7 @@ class QuasiTransferStatusProcessing extends QuasiTransferStatus implements JsonS
         return array_filter(
             array(
                 '_type' => self::Variant, 
-                'reason' => $this->reason,
+                'reason' => ($this->reason !== null ? $this->reason->toArray() : null),
             )
             , function ($v) { return $v !== null; }
         );

@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,11 +20,8 @@ use JsonSerializable;
 
 class Otp implements JsonSerializable  {
 
-    /** @var UTCDateTime */
-    protected $maxDeliveryTime ;
-
-    /** @var UTCDateTime */
-    protected $expireTime ;
+    /** @var Expire */
+    protected $expire ;
 
     /** @var integer */
     protected $nbVerifyAttempts ;
@@ -44,21 +41,18 @@ class Otp implements JsonSerializable  {
 
     /**
      * Otp constructor
-     * @param UTCDateTime $maxDeliveryTime
-     * @param UTCDateTime $expireTime
+     * @param Expire $expire
      * @param integer $nbVerifyAttempts
      * @param string | null $prefix
      * @param OtpChannel $channel
      * @param OtpAction $action
      */
-    function __construct(UTCDateTime $maxDeliveryTime,
-                         UTCDateTime $expireTime,
+    function __construct(Expire $expire,
                          $nbVerifyAttempts,
                          $prefix = null,
                          OtpChannel $channel,
                          OtpAction $action) {
-        $this->maxDeliveryTime = $maxDeliveryTime;
-        $this->expireTime = $expireTime;
+        $this->expire = $expire;
         $this->nbVerifyAttempts = $nbVerifyAttempts;
         $this->prefix = $prefix;
         $this->channel = $channel;
@@ -66,21 +60,12 @@ class Otp implements JsonSerializable  {
     }
 
     /**
-     * Getter of the field 'maxDeliveryTime'.
+     * Getter of the field 'expire'.
      *
-     * @return UTCDateTime
+     * @return Expire
      */
-    public function getMaxDeliveryTime() {
-        return $this->maxDeliveryTime;
-    }
-
-    /**
-     * Getter of the field 'expireTime'.
-     *
-     * @return UTCDateTime
-     */
-    public function getExpireTime() {
-        return $this->expireTime;
+    public function getExpire() {
+        return $this->expire;
     }
 
     /**
@@ -127,27 +112,14 @@ class Otp implements JsonSerializable  {
     public function getType() { return self::Type; } 
 
     /**
-     * Immutable update. Return a new Otp where the field 'maxDeliveryTime' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Otp where the field 'expire' has been updated with the value passed as parameter.
      *
-     * @param UTCDateTime $maxDeliveryTime
+     * @param Expire $expire
      * @return Otp
      */
-    public function withMaxDeliveryTime(UTCDateTime $maxDeliveryTime) {
-        assert($this->maxDeliveryTime != null, "In class Otp the param 'maxDeliveryTime' of type UTCDateTime can not be null");
-        return new Otp($maxDeliveryTime, $this->expireTime, $this->nbVerifyAttempts, $this->prefix,
-                       $this->channel, $this->action);
-    }
-
-    /**
-     * Immutable update. Return a new Otp where the field 'expireTime' has been updated with the value passed as parameter.
-     *
-     * @param UTCDateTime $expireTime
-     * @return Otp
-     */
-    public function withExpireTime(UTCDateTime $expireTime) {
-        assert($this->expireTime != null, "In class Otp the param 'expireTime' of type UTCDateTime can not be null");
-        return new Otp($this->maxDeliveryTime, $expireTime, $this->nbVerifyAttempts, $this->prefix,
-                       $this->channel, $this->action);
+    public function withExpire(Expire $expire) {
+        assert($this->expire != null, "In class Otp the param 'expire' of type Expire can not be null");
+        return new Otp($expire, $this->nbVerifyAttempts, $this->prefix, $this->channel, $this->action);
     }
 
     /**
@@ -157,8 +129,7 @@ class Otp implements JsonSerializable  {
      * @return Otp
      */
     public function withNbVerifyAttempts($nbVerifyAttempts) {
-        return new Otp($this->maxDeliveryTime, $this->expireTime, $nbVerifyAttempts, $this->prefix,
-                       $this->channel, $this->action);
+        return new Otp($this->expire, $nbVerifyAttempts, $this->prefix, $this->channel, $this->action);
     }
 
     /**
@@ -168,8 +139,7 @@ class Otp implements JsonSerializable  {
      * @return Otp
      */
     public function withPrefix($prefix) {
-        return new Otp($this->maxDeliveryTime, $this->expireTime, $this->nbVerifyAttempts,
-                       $prefix, $this->channel, $this->action);
+        return new Otp($this->expire, $this->nbVerifyAttempts, $prefix, $this->channel, $this->action);
     }
 
     /**
@@ -180,8 +150,7 @@ class Otp implements JsonSerializable  {
      */
     public function withChannel(OtpChannel $channel) {
         assert($this->channel != null, "In class Otp the param 'channel' of type OtpChannel can not be null");
-        return new Otp($this->maxDeliveryTime, $this->expireTime, $this->nbVerifyAttempts,
-                       $this->prefix, $channel, $this->action);
+        return new Otp($this->expire, $this->nbVerifyAttempts, $this->prefix, $channel, $this->action);
     }
 
     /**
@@ -192,8 +161,8 @@ class Otp implements JsonSerializable  {
      */
     public function withAction(OtpAction $action) {
         assert($this->action != null, "In class Otp the param 'action' of type OtpAction can not be null");
-        return new Otp($this->maxDeliveryTime, $this->expireTime, $this->nbVerifyAttempts,
-                       $this->prefix, $this->channel, $action);
+        return new Otp($this->expire, $this->nbVerifyAttempts, $this->prefix, $this->channel,
+                       $action);
     }
 
     /**
@@ -214,8 +183,7 @@ class Otp implements JsonSerializable  {
      * @return Otp
      */
     public static function fromArray(array $array) {
-        return new Otp(UTCDateTime::fromArray($array['maxDeliveryTime']),
-                       UTCDateTime::fromArray($array['expireTime']),
+        return new Otp(Expire::fromArray($array['expire']),
                        $array['nbVerifyAttempts'],
                        (isset($array['prefix']) ? $array['prefix'] : null),
                        OtpChannel::fromArray($array['channel']),
@@ -248,8 +216,7 @@ class Otp implements JsonSerializable  {
     public function toArray() {
         return array_filter(
             array(
-                'maxDeliveryTime' => ($this->maxDeliveryTime !== null ? $this->maxDeliveryTime->toArray() : null),
-                'expireTime' => ($this->expireTime !== null ? $this->expireTime->toArray() : null),
+                'expire' => ($this->expire !== null ? $this->expire->toArray() : null),
                 'nbVerifyAttempts' => $this->nbVerifyAttempts,
                 'prefix' => $this->prefix,
                 'channel' => ($this->channel !== null ? $this->channel->toArray() : null),
@@ -260,8 +227,7 @@ class Otp implements JsonSerializable  {
     }
 
     public function __toString() {
-        return "Otp{maxDeliveryTime=" . $this->maxDeliveryTime .
-                   ", expireTime=" . $this->expireTime .
+        return "Otp{expire=" . $this->expire .
                    ", nbVerifyAttempts=" . $this->nbVerifyAttempts .
                    ", prefix=" . $this->prefix .
                    ", channel=" . $this->channel .

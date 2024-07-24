@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,64 +31,75 @@ class QuasiTransferService {
     }
 
     /**
+     * ListAll QuasiTransfer
+     *
+     * @param Page $page
+     * @return RestCollection
+     */
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/quasi-transfers", $page->getQueryString(), array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
+    }
+
+    /**
      * Receive QuasiTransfer
      *
-     * @param ReceiveQuasiTransferForm $form
-     * @return MfaProcess
+     * @param mixed $form
+     * @return Attempt
      */
-    public function receive(ReceiveQuasiTransferForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers/" . $form->getId() . "/receive", $form->toJson(), "", array(), function($value){ return MfaProcess::fromArray($value); }, $this->auth);
+    public function receive($form) {
+        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers/" . $form['id'] . "/receive", json_encode($form), "", array(), function($value){ return Attempt::fromArray($value); }, $this->auth);
     }
 
     /**
      * Cancel QuasiTransfer
      *
-     * @param CancelQuasiTransferForm $form
+     * @param string $form
      * @return QuasiTransfer
      */
-    public function cancel(CancelQuasiTransferForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers/" . $form->getId() . "/cancel", $form->toJson(), "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
+    public function cancel($form) {
+        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers/" . $form . "/cancel", null, "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
     }
 
     /**
-     * Create QuasiTransfer
+     * Initiate QuasiTransfer
      *
-     * @param CreateQuasiTransferForm $form
+     * @param mixed $form
      * @return QuasiTransfer
      */
-    public function create(CreateQuasiTransferForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers", $form->toJson(), "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
+    public function initiate($form) {
+        return Http::Post("/" . Sdk::VERSION . "/quasi-transfers/initiate", json_encode($form), "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
     }
 
     /**
      * Get QuasiTransfer
      *
-     * @param string $id
+     * @param string $form
      * @return QuasiTransfer
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/quasi-transfers/" . $id, "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/quasi-transfers/" . $form, "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List QuasiTransfer
+     * ListAll QuasiTransfer
      *
-     * @param ListForm $form
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/quasi-transfers", $qs, array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update QuasiTransfer
      *
-     * @param UpdateQuasiTransferForm $form
+     * @param mixed $form
      * @return QuasiTransfer
      */
-    public function update(UpdateQuasiTransferForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/quasi-transfers/" . $form->getId(), $form->toJson(), "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/quasi-transfers/" . $form['id'], json_encode($form), "", array(), function($value){ return QuasiTransfer::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

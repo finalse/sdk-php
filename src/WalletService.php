@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,44 +31,55 @@ class WalletService {
     }
 
     /**
+     * ListAll Wallet
+     *
+     * @param Page $page
+     * @return RestCollection
+     */
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/wallets", $page->getQueryString(), array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
+    }
+
+    /**
      * Create Wallet
      *
-     * @param CreateWalletForm $form
+     * @param mixed $form
      * @return Wallet
      */
-    public function create(CreateWalletForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/wallets", $form->toJson(), "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
+    public function create($form) {
+        return Http::Post("/" . Sdk::VERSION . "/wallets", json_encode($form), "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
     }
 
     /**
      * Get Wallet
      *
-     * @param string $id
+     * @param string $form
      * @return Wallet
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/wallets/" . $id, "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/wallets/" . $form, "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List Wallet
+     * ListAll Wallet
      *
-     * @param ListForm $form
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/wallets", $qs, array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update Wallet
      *
-     * @param UpdateWalletForm $form
+     * @param mixed $form
      * @return Wallet
      */
-    public function update(UpdateWalletForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/wallets/" . $form->getId(), $form->toJson(), "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/wallets/" . $form['id'], json_encode($form), "", array(), function($value){ return Wallet::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

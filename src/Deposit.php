@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,17 +29,32 @@ class Deposit implements JsonSerializable  {
     /** @var UTCDateTime */
     protected $createdTime ;
 
-    /** @var H1Descriptor */
+    /** @var Creator */
+    protected $creator ;
+
+    /** @var UTCDateTime | null */
+    protected $completedTime ;
+
+    /** @var H1Descriptor | null */
     protected $h1Descriptor ;
 
-    /** @var Wallet */
-    protected $wallet ;
+    /** @var Source */
+    protected $source ;
 
-    /** @var DepositMethod */
-    protected $method ;
+    /** @var Destination */
+    protected $destination ;
+
+    /** @var Fees */
+    protected $fees ;
+
+    /** @var LightAttempt */
+    protected $attempt ;
 
     /** @var Amount */
     protected $amount ;
+
+    /** @var Sending */
+    protected $sending ;
 
     /** @var DepositStatus */
     protected $status ;
@@ -62,10 +77,15 @@ class Deposit implements JsonSerializable  {
      * @param string $id
      * @param string $url
      * @param UTCDateTime $createdTime
-     * @param H1Descriptor $h1Descriptor
-     * @param Wallet $wallet
-     * @param DepositMethod $method
+     * @param Creator $creator
+     * @param UTCDateTime | null $completedTime
+     * @param H1Descriptor | null $h1Descriptor
+     * @param Source $source
+     * @param Destination $destination
+     * @param Fees $fees
+     * @param LightAttempt $attempt
      * @param Amount $amount
+     * @param Sending $sending
      * @param DepositStatus $status
      * @param string | null $description
      * @param string | null $foreignId
@@ -74,10 +94,15 @@ class Deposit implements JsonSerializable  {
     function __construct($id,
                          $url,
                          UTCDateTime $createdTime,
-                         H1Descriptor $h1Descriptor,
-                         Wallet $wallet,
-                         DepositMethod $method,
+                         Creator $creator,
+                         $completedTime = null,
+                         $h1Descriptor = null,
+                         Source $source,
+                         Destination $destination,
+                         Fees $fees,
+                         LightAttempt $attempt,
                          Amount $amount,
+                         Sending $sending,
                          DepositStatus $status,
                          $description = null,
                          $foreignId = null,
@@ -85,10 +110,15 @@ class Deposit implements JsonSerializable  {
         $this->id = $id;
         $this->url = $url;
         $this->createdTime = $createdTime;
+        $this->creator = $creator;
+        $this->completedTime = $completedTime;
         $this->h1Descriptor = $h1Descriptor;
-        $this->wallet = $wallet;
-        $this->method = $method;
+        $this->source = $source;
+        $this->destination = $destination;
+        $this->fees = $fees;
+        $this->attempt = $attempt;
         $this->amount = $amount;
+        $this->sending = $sending;
         $this->status = $status;
         $this->description = $description;
         $this->foreignId = $foreignId;
@@ -123,30 +153,66 @@ class Deposit implements JsonSerializable  {
     }
 
     /**
+     * Getter of the field 'creator'.
+     *
+     * @return Creator
+     */
+    public function getCreator() {
+        return $this->creator;
+    }
+
+    /**
+     * Getter of the field 'completedTime'.
+     *
+     * @return UTCDateTime | null
+     */
+    public function getCompletedTime() {
+        return $this->completedTime;
+    }
+
+    /**
      * Getter of the field 'h1Descriptor'.
      *
-     * @return H1Descriptor
+     * @return H1Descriptor | null
      */
     public function getH1Descriptor() {
         return $this->h1Descriptor;
     }
 
     /**
-     * Getter of the field 'wallet'.
+     * Getter of the field 'source'.
      *
-     * @return Wallet
+     * @return Source
      */
-    public function getWallet() {
-        return $this->wallet;
+    public function getSource() {
+        return $this->source;
     }
 
     /**
-     * Getter of the field 'method'.
+     * Getter of the field 'destination'.
      *
-     * @return DepositMethod
+     * @return Destination
      */
-    public function getMethod() {
-        return $this->method;
+    public function getDestination() {
+        return $this->destination;
+    }
+
+    /**
+     * Getter of the field 'fees'.
+     *
+     * @return Fees
+     */
+    public function getFees() {
+        return $this->fees;
+    }
+
+    /**
+     * Getter of the field 'attempt'.
+     *
+     * @return LightAttempt
+     */
+    public function getAttempt() {
+        return $this->attempt;
     }
 
     /**
@@ -156,6 +222,15 @@ class Deposit implements JsonSerializable  {
      */
     public function getAmount() {
         return $this->amount;
+    }
+
+    /**
+     * Getter of the field 'sending'.
+     *
+     * @return Sending
+     */
+    public function getSending() {
+        return $this->sending;
     }
 
     /**
@@ -208,9 +283,10 @@ class Deposit implements JsonSerializable  {
      * @return Deposit
      */
     public function withId($id) {
-        return new Deposit($id, $this->url, $this->createdTime, $this->h1Descriptor, $this->wallet,
-                           $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $this->foreignData);
+        return new Deposit($id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -220,9 +296,10 @@ class Deposit implements JsonSerializable  {
      * @return Deposit
      */
     public function withUrl($url) {
-        return new Deposit($this->id, $url, $this->createdTime, $this->h1Descriptor, $this->wallet,
-                           $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $this->foreignData);
+        return new Deposit($this->id, $url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -233,47 +310,107 @@ class Deposit implements JsonSerializable  {
      */
     public function withCreatedTime(UTCDateTime $createdTime) {
         assert($this->createdTime != null, "In class Deposit the param 'createdTime' of type UTCDateTime can not be null");
-        return new Deposit($this->id, $this->url, $createdTime, $this->h1Descriptor, $this->wallet,
-                           $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $this->foreignData);
+        return new Deposit($this->id, $this->url, $createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Deposit where the field 'creator' has been updated with the value passed as parameter.
+     *
+     * @param Creator $creator
+     * @return Deposit
+     */
+    public function withCreator(Creator $creator) {
+        assert($this->creator != null, "In class Deposit the param 'creator' of type Creator can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Deposit where the field 'completedTime' has been updated with the value passed as parameter.
+     *
+     * @param UTCDateTime | null $completedTime
+     * @return Deposit
+     */
+    public function withCompletedTime($completedTime) {
+        assert($this->completedTime != null, "In class Deposit the param 'completedTime' of type UTCDateTime | null can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
      * Immutable update. Return a new Deposit where the field 'h1Descriptor' has been updated with the value passed as parameter.
      *
-     * @param H1Descriptor $h1Descriptor
+     * @param H1Descriptor | null $h1Descriptor
      * @return Deposit
      */
-    public function withH1Descriptor(H1Descriptor $h1Descriptor) {
-        assert($this->h1Descriptor != null, "In class Deposit the param 'h1Descriptor' of type H1Descriptor can not be null");
-        return new Deposit($this->id, $this->url, $this->createdTime, $h1Descriptor, $this->wallet,
-                           $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $this->foreignData);
+    public function withH1Descriptor($h1Descriptor) {
+        assert($this->h1Descriptor != null, "In class Deposit the param 'h1Descriptor' of type H1Descriptor | null can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
-     * Immutable update. Return a new Deposit where the field 'wallet' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Deposit where the field 'source' has been updated with the value passed as parameter.
      *
-     * @param Wallet $wallet
+     * @param Source $source
      * @return Deposit
      */
-    public function withWallet(Wallet $wallet) {
-        assert($this->wallet != null, "In class Deposit the param 'wallet' of type Wallet can not be null");
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $wallet, $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $this->foreignData);
+    public function withSource(Source $source) {
+        assert($this->source != null, "In class Deposit the param 'source' of type Source can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
-     * Immutable update. Return a new Deposit where the field 'method' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Deposit where the field 'destination' has been updated with the value passed as parameter.
      *
-     * @param DepositMethod $method
+     * @param Destination $destination
      * @return Deposit
      */
-    public function withMethod(DepositMethod $method) {
-        assert($this->method != null, "In class Deposit the param 'method' of type DepositMethod can not be null");
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $method, $this->amount, $this->status, $this->description,
+    public function withDestination(Destination $destination) {
+        assert($this->destination != null, "In class Deposit the param 'destination' of type Destination can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Deposit where the field 'fees' has been updated with the value passed as parameter.
+     *
+     * @param Fees $fees
+     * @return Deposit
+     */
+    public function withFees(Fees $fees) {
+        assert($this->fees != null, "In class Deposit the param 'fees' of type Fees can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Deposit where the field 'attempt' has been updated with the value passed as parameter.
+     *
+     * @param LightAttempt $attempt
+     * @return Deposit
+     */
+    public function withAttempt(LightAttempt $attempt) {
+        assert($this->attempt != null, "In class Deposit the param 'attempt' of type LightAttempt can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $attempt, $this->amount, $this->sending, $this->status, $this->description,
                            $this->foreignId, $this->foreignData);
     }
 
@@ -285,8 +422,23 @@ class Deposit implements JsonSerializable  {
      */
     public function withAmount(Amount $amount) {
         assert($this->amount != null, "In class Deposit the param 'amount' of type Amount can not be null");
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $this->method, $amount, $this->status, $this->description,
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $amount, $this->sending, $this->status, $this->description,
+                           $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Deposit where the field 'sending' has been updated with the value passed as parameter.
+     *
+     * @param Sending $sending
+     * @return Deposit
+     */
+    public function withSending(Sending $sending) {
+        assert($this->sending != null, "In class Deposit the param 'sending' of type Sending can not be null");
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $sending, $this->status, $this->description,
                            $this->foreignId, $this->foreignData);
     }
 
@@ -298,8 +450,9 @@ class Deposit implements JsonSerializable  {
      */
     public function withStatus(DepositStatus $status) {
         assert($this->status != null, "In class Deposit the param 'status' of type DepositStatus can not be null");
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $this->method, $this->amount, $status, $this->description,
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $status, $this->description,
                            $this->foreignId, $this->foreignData);
     }
 
@@ -310,9 +463,10 @@ class Deposit implements JsonSerializable  {
      * @return Deposit
      */
     public function withDescription($description) {
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $this->method, $this->amount, $this->status, $description,
-                           $this->foreignId, $this->foreignData);
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -322,9 +476,10 @@ class Deposit implements JsonSerializable  {
      * @return Deposit
      */
     public function withForeignId($foreignId) {
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $this->method, $this->amount, $this->status, $this->description,
-                           $foreignId, $this->foreignData);
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $foreignId, $this->foreignData);
     }
 
     /**
@@ -334,9 +489,10 @@ class Deposit implements JsonSerializable  {
      * @return Deposit
      */
     public function withForeignData($foreignData) {
-        return new Deposit($this->id, $this->url, $this->createdTime, $this->h1Descriptor,
-                           $this->wallet, $this->method, $this->amount, $this->status, $this->description,
-                           $this->foreignId, $foreignData);
+        return new Deposit($this->id, $this->url, $this->createdTime, $this->creator, $this->completedTime,
+                           $this->h1Descriptor, $this->source, $this->destination, $this->fees,
+                           $this->attempt, $this->amount, $this->sending, $this->status,
+                           $this->description, $this->foreignId, $foreignData);
     }
 
     /**
@@ -360,10 +516,15 @@ class Deposit implements JsonSerializable  {
         return new Deposit($array['id'],
                            $array['url'],
                            UTCDateTime::fromArray($array['createdTime']),
-                           H1Descriptor::fromArray($array['h1Descriptor']),
-                           Wallet::fromArray($array['wallet']),
-                           DepositMethod::fromArray($array['method']),
+                           Creator::fromArray($array['creator']),
+                           (isset($array['completedTime']) ? UTCDateTime::fromArray($array['completedTime']) : null),
+                           (isset($array['h1Descriptor']) ? H1Descriptor::fromArray($array['h1Descriptor']) : null),
+                           Source::fromArray($array['source']),
+                           Destination::fromArray($array['destination']),
+                           Fees::fromArray($array['fees']),
+                           LightAttempt::fromArray($array['attempt']),
                            Amount::fromArray($array['amount']),
+                           Sending::fromString($array['sending']),
                            DepositStatus::fromArray($array['status']),
                            (isset($array['description']) ? $array['description'] : null),
                            (isset($array['foreignId']) ? $array['foreignId'] : null),
@@ -399,10 +560,15 @@ class Deposit implements JsonSerializable  {
                 'id' => $this->id,
                 'url' => $this->url,
                 'createdTime' => ($this->createdTime !== null ? $this->createdTime->toArray() : null),
+                'creator' => ($this->creator !== null ? $this->creator->toArray() : null),
+                'completedTime' => ($this->completedTime !== null ? $this->completedTime->toArray() : null),
                 'h1Descriptor' => ($this->h1Descriptor !== null ? $this->h1Descriptor->toArray() : null),
-                'wallet' => ($this->wallet !== null ? $this->wallet->toArray() : null),
-                'method' => ($this->method !== null ? $this->method->toArray() : null),
+                'source' => ($this->source !== null ? $this->source->toArray() : null),
+                'destination' => ($this->destination !== null ? $this->destination->toArray() : null),
+                'fees' => ($this->fees !== null ? $this->fees->toArray() : null),
+                'attempt' => ($this->attempt !== null ? $this->attempt->toArray() : null),
                 'amount' => ($this->amount !== null ? $this->amount->toArray() : null),
+                'sending' => ((string) $this->sending),
                 'status' => ($this->status !== null ? $this->status->toArray() : null),
                 'description' => $this->description,
                 'foreignId' => $this->foreignId,
@@ -416,10 +582,15 @@ class Deposit implements JsonSerializable  {
         return "Deposit{id=" . $this->id .
                        ", url=" . $this->url .
                        ", createdTime=" . $this->createdTime .
+                       ", creator=" . $this->creator .
+                       ", completedTime=" . $this->completedTime .
                        ", h1Descriptor=" . $this->h1Descriptor .
-                       ", wallet=" . $this->wallet .
-                       ", method=" . $this->method .
+                       ", source=" . $this->source .
+                       ", destination=" . $this->destination .
+                       ", fees=" . $this->fees .
+                       ", attempt=" . $this->attempt .
                        ", amount=" . $this->amount .
+                       ", sending=" . $this->sending .
                        ", status=" . $this->status .
                        ", description=" . $this->description .
                        ", foreignId=" . $this->foreignId .

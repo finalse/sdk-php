@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ use JsonSerializable;
 
 class FundRequestStatusProcessing extends FundRequestStatus implements JsonSerializable  {
 
-    /** @var string */
+    /** @var LocalizedText */
     protected $reason ;
 
 
@@ -33,16 +33,16 @@ class FundRequestStatusProcessing extends FundRequestStatus implements JsonSeria
 
     /**
      * FundRequestStatusProcessing constructor
-     * @param string $reason
+     * @param LocalizedText $reason
      */
-    function __construct($reason) {
+    function __construct(LocalizedText $reason) {
         $this->reason = $reason;
     }
 
     /**
      * Getter of the field 'reason'.
      *
-     * @return string
+     * @return LocalizedText
      */
     public function getReason() {
         return $this->reason;
@@ -58,10 +58,11 @@ class FundRequestStatusProcessing extends FundRequestStatus implements JsonSeria
     /**
      * Immutable update. Return a new FundRequestStatusProcessing where the field 'reason' has been updated with the value passed as parameter.
      *
-     * @param string $reason
+     * @param LocalizedText $reason
      * @return FundRequestStatusProcessing
      */
-    public function withReason($reason) {
+    public function withReason(LocalizedText $reason) {
+        assert($this->reason != null, "In class FundRequestStatusProcessing the param 'reason' of type LocalizedText can not be null");
         return new FundRequestStatusProcessing($reason);
     }
 
@@ -83,7 +84,7 @@ class FundRequestStatusProcessing extends FundRequestStatus implements JsonSeria
      * @return FundRequestStatusProcessing
      */
     public static function fromArray(array $array) {
-        return new FundRequestStatusProcessing($array['reason']);
+        return new FundRequestStatusProcessing(LocalizedText::fromArray($array['reason']));
     }
 
     /**
@@ -113,7 +114,7 @@ class FundRequestStatusProcessing extends FundRequestStatus implements JsonSeria
         return array_filter(
             array(
                 '_type' => self::Variant, 
-                'reason' => $this->reason,
+                'reason' => ($this->reason !== null ? $this->reason->toArray() : null),
             )
             , function ($v) { return $v !== null; }
         );

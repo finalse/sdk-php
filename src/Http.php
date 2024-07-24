@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class Http {
 
 
     private static function call($path, $method,  $headers, $queryString, $body, Auth $auth) {
-        $fullPath = $path . ($queryString ?: "");
+        $url = Sdk::SCHEME . '://' . Sdk::HOST . $path . ($queryString ?: "");
         $bodyHash = $body == null ? null : Http::sha256($body);
         $explodedTime = explode(' ', microtime());
         $nonce = $explodedTime[1] . str_pad(substr($explodedTime[0], 2, 3), 3, '0');
@@ -61,15 +61,14 @@ class Http {
                 $nonce,
                 $signedHeaders,
                 $method,
-                $fullPath,
+                $path,
                 $queryString,
                 $bodyHash);
-
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_URL, Sdk::HOST . $path);
+        curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, Http::prepareHeaders(array_merge($signedHeaders, array(
             "Finalse-Nonce" =>  $request->nonce,
             "Finalse-SignedHeaders" =>  implode(",", array_keys($signedHeaders)),
@@ -80,16 +79,16 @@ class Http {
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
                 break;
             case "POST":
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 break;
             case "PATCH":
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PATCH");
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 break;
             case "PUT":
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
                 break;
             case "DELETE":
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -138,10 +137,10 @@ class Http {
     }
 
     static private function sha256($message) {
-        return hash('sha256', $message);
+        return base64_encode(hash('sha256', $message, true));
     }
 
     static private function sign($message, $privateKey) {
-        return hash_hmac('sha512',  $message, $privateKey);
+        return base64_encode(hash_hmac('sha512',  $message, $privateKey, true));
     }
 }

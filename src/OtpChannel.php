@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -32,12 +32,16 @@ abstract class OtpChannel implements JsonSerializable  {
         return $this->getType() === OtpChannelEmailChannel::Type;
     }
 
-    public function isNotSmsChannel() {
-        return $this->getType() !== OtpChannelSmsChannel::Type; 
+    /** @return OtpChannelSmsChannel | null */
+    public function asSmsChannel() {
+        if($this->getType() == OtpChannelSmsChannel::Type) return $this;
+        else return null;
     }
 
-    public function isNotEmailChannel() {
-        return $this->getType() !== OtpChannelEmailChannel::Type; 
+    /** @return OtpChannelEmailChannel | null */
+    public function asEmailChannel() {
+        if($this->getType() == OtpChannelEmailChannel::Type) return $this;
+        else return null;
     }
 
     /**
@@ -80,5 +84,14 @@ abstract class OtpChannel implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

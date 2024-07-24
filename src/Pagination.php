@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,31 +16,27 @@
 */
 
 
-
 use JsonSerializable;
 
 class Pagination implements JsonSerializable  {
 
+    /** @var Page */
+    protected $currentPage ;
+
+    /** @var Page | null */
+    protected $previousPage ;
+
+    /** @var Page | null */
+    protected $nextPage ;
+
     /** @var string */
-    private $selfUrl ;
-
-    /** @var string | null */
-    private $prevUrl ;
-
-    /** @var string | null */
-    private $nextUrl ;
-
-    /** @var UTCDateTime */
-    private $startedTime ;
+    protected $startedTime ;
 
     /** @var integer */
-    private $nbItemsOnThisPage ;
+    protected $nbItemsOnCurrentPage ;
 
     /** @var integer */
-    private $page ;
-
-    /** @var integer */
-    private $nbItemsPerPage ;
+    protected $nbItemsPerPage ;
 
 
     /** @var string */
@@ -48,82 +44,70 @@ class Pagination implements JsonSerializable  {
 
     /**
      * Pagination constructor
-     * @param string $selfUrl
-     * @param string | null $prevUrl
-     * @param string | null $nextUrl
-     * @param UTCDateTime $startedTime
-     * @param integer $nbItemsOnThisPage
-     * @param integer $page
+     * @param Page $currentPage
+     * @param Page | null $previousPage
+     * @param Page | null $nextPage
+     * @param string $startedTime
+     * @param integer $nbItemsOnCurrentPage
      * @param integer $nbItemsPerPage
      */
-    function __construct($selfUrl,
-                         $prevUrl,
-                         $nextUrl,
-                         UTCDateTime $startedTime,
-        $nbItemsOnThisPage,
-        $page,
-        $nbItemsPerPage) {
-        $this->selfUrl = $selfUrl;
-        $this->prevUrl = $prevUrl;
-        $this->nextUrl = $nextUrl;
+    function __construct(Page $currentPage,
+                         $previousPage = null,
+                         $nextPage = null,
+                         $startedTime,
+                         $nbItemsOnCurrentPage,
+                         $nbItemsPerPage) {
+        $this->currentPage = $currentPage;
+        $this->previousPage = $previousPage;
+        $this->nextPage = $nextPage;
         $this->startedTime = $startedTime;
-        $this->nbItemsOnThisPage = $nbItemsOnThisPage;
-        $this->page = $page;
+        $this->nbItemsOnCurrentPage = $nbItemsOnCurrentPage;
         $this->nbItemsPerPage = $nbItemsPerPage;
     }
 
     /**
-     * Getter of the field 'selfUrl'.
+     * Getter of the field 'currentPage'.
      *
-     * @return string
+     * @return Page
      */
-    public function getSelfUrl() {
-        return $this->selfUrl;
+    public function getCurrentPage() {
+        return $this->currentPage;
     }
 
     /**
-     * Getter of the field 'prevUrl'.
+     * Getter of the field 'previousPage'.
      *
-     * @return string | null
+     * @return Page | null
      */
-    public function getPrevUrl() {
-        return $this->prevUrl;
+    public function getPreviousPage() {
+        return $this->previousPage;
     }
 
     /**
-     * Getter of the field 'nextUrl'.
+     * Getter of the field 'nextPage'.
      *
-     * @return string | null
+     * @return Page | null
      */
-    public function getNextUrl() {
-        return $this->nextUrl;
+    public function getNextPage() {
+        return $this->nextPage;
     }
 
     /**
      * Getter of the field 'startedTime'.
      *
-     * @return UTCDateTime
+     * @return string
      */
     public function getStartedTime() {
         return $this->startedTime;
     }
 
     /**
-     * Getter of the field 'nbItemsOnThisPage'.
+     * Getter of the field 'nbItemsOnCurrentPage'.
      *
      * @return integer
      */
-    public function getNbItemsOnThisPage() {
-        return $this->nbItemsOnThisPage;
-    }
-
-    /**
-     * Getter of the field 'page'.
-     *
-     * @return integer
-     */
-    public function getPage() {
-        return $this->page;
+    public function getNbItemsOnCurrentPage() {
+        return $this->nbItemsOnCurrentPage;
     }
 
     /**
@@ -140,73 +124,64 @@ class Pagination implements JsonSerializable  {
      *
      * @return string
      */
-    public function getType() { return self::Type; }
+    public function getType() { return self::Type; } 
 
     /**
-     * Immutable update. Return a new Pagination where the field 'selfUrl' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Pagination where the field 'currentPage' has been updated with the value passed as parameter.
      *
-     * @param string $selfUrl
+     * @param Page $currentPage
      * @return Pagination
      */
-    public function withSelfUrl($selfUrl) {
-        return new Pagination($selfUrl, $this->prevUrl, $this->nextUrl, $this->startedTime,
-            $this->nbItemsOnThisPage, $this->page, $this->nbItemsPerPage);
+    public function withCurrentPage(Page $currentPage) {
+        assert($this->currentPage != null, "In class Pagination the param 'currentPage' of type Page can not be null");
+        return new Pagination($currentPage, $this->previousPage, $this->nextPage, $this->startedTime,
+                              $this->nbItemsOnCurrentPage, $this->nbItemsPerPage);
     }
 
     /**
-     * Immutable update. Return a new Pagination where the field 'prevUrl' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Pagination where the field 'previousPage' has been updated with the value passed as parameter.
      *
-     * @param string | null $prevUrl
+     * @param Page | null $previousPage
      * @return Pagination
      */
-    public function withPrevUrl($prevUrl) {
-        return new Pagination($this->selfUrl, $prevUrl, $this->nextUrl, $this->startedTime,
-            $this->nbItemsOnThisPage, $this->page, $this->nbItemsPerPage);
+    public function withPreviousPage($previousPage) {
+        assert($this->previousPage != null, "In class Pagination the param 'previousPage' of type Page | null can not be null");
+        return new Pagination($this->currentPage, $previousPage, $this->nextPage, $this->startedTime,
+                              $this->nbItemsOnCurrentPage, $this->nbItemsPerPage);
     }
 
     /**
-     * Immutable update. Return a new Pagination where the field 'nextUrl' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Pagination where the field 'nextPage' has been updated with the value passed as parameter.
      *
-     * @param string | null $nextUrl
+     * @param Page | null $nextPage
      * @return Pagination
      */
-    public function withNextUrl($nextUrl) {
-        return new Pagination($this->selfUrl, $this->prevUrl, $nextUrl, $this->startedTime,
-            $this->nbItemsOnThisPage, $this->page, $this->nbItemsPerPage);
+    public function withNextPage($nextPage) {
+        assert($this->nextPage != null, "In class Pagination the param 'nextPage' of type Page | null can not be null");
+        return new Pagination($this->currentPage, $this->previousPage, $nextPage, $this->startedTime,
+                              $this->nbItemsOnCurrentPage, $this->nbItemsPerPage);
     }
 
     /**
      * Immutable update. Return a new Pagination where the field 'startedTime' has been updated with the value passed as parameter.
      *
-     * @param UTCDateTime $startedTime
+     * @param string $startedTime
      * @return Pagination
      */
-    public function withStartedTime(UTCDateTime $startedTime) {
-        assert($this->startedTime != null, "In class Pagination the param 'startedTime' of type UTCDateTime can not be null");
-        return new Pagination($this->selfUrl, $this->prevUrl, $this->nextUrl, $startedTime,
-            $this->nbItemsOnThisPage, $this->page, $this->nbItemsPerPage);
+    public function withStartedTime($startedTime) {
+        return new Pagination($this->currentPage, $this->previousPage, $this->nextPage, $startedTime,
+                              $this->nbItemsOnCurrentPage, $this->nbItemsPerPage);
     }
 
     /**
-     * Immutable update. Return a new Pagination where the field 'nbItemsOnThisPage' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Pagination where the field 'nbItemsOnCurrentPage' has been updated with the value passed as parameter.
      *
-     * @param integer $nbItemsOnThisPage
+     * @param integer $nbItemsOnCurrentPage
      * @return Pagination
      */
-    public function withNbItemsOnThisPage($nbItemsOnThisPage) {
-        return new Pagination($this->selfUrl, $this->prevUrl, $this->nextUrl, $this->startedTime,
-            $nbItemsOnThisPage, $this->page, $this->nbItemsPerPage);
-    }
-
-    /**
-     * Immutable update. Return a new Pagination where the field 'page' has been updated with the value passed as parameter.
-     *
-     * @param integer $page
-     * @return Pagination
-     */
-    public function withPage($page) {
-        return new Pagination($this->selfUrl, $this->prevUrl, $this->nextUrl, $this->startedTime,
-            $this->nbItemsOnThisPage, $page, $this->nbItemsPerPage);
+    public function withNbItemsOnCurrentPage($nbItemsOnCurrentPage) {
+        return new Pagination($this->currentPage, $this->previousPage, $this->nextPage, $this->startedTime,
+                              $nbItemsOnCurrentPage, $this->nbItemsPerPage);
     }
 
     /**
@@ -216,8 +191,8 @@ class Pagination implements JsonSerializable  {
      * @return Pagination
      */
     public function withNbItemsPerPage($nbItemsPerPage) {
-        return new Pagination($this->selfUrl, $this->prevUrl, $this->nextUrl, $this->startedTime,
-            $this->nbItemsOnThisPage, $this->page, $nbItemsPerPage);
+        return new Pagination($this->currentPage, $this->previousPage, $this->nextPage, $this->startedTime,
+                              $this->nbItemsOnCurrentPage, $nbItemsPerPage);
     }
 
     /**
@@ -238,13 +213,12 @@ class Pagination implements JsonSerializable  {
      * @return Pagination
      */
     public static function fromArray(array $array) {
-        return new Pagination($array['selfUrl'],
-            (isset($array['prevUrl']) ? $array['prevUrl'] : null),
-            (isset($array['nextUrl']) ? $array['nextUrl'] : null),
-            UTCDateTime::fromArray($array['startedTime']),
-            $array['nbItemsOnThisPage'],
-            $array['page'],
-            $array['nbItemsPerPage']);
+        return new Pagination(Page::fromArray($array['currentPage']),
+                              (isset($array['previousPage']) ? Page::fromArray($array['previousPage']) : null),
+                              (isset($array['nextPage']) ? Page::fromArray($array['nextPage']) : null),
+                              $array['startedTime'],
+                              $array['nbItemsOnCurrentPage'],
+                              $array['nbItemsPerPage']);
     }
 
     /**
@@ -271,16 +245,25 @@ class Pagination implements JsonSerializable  {
      * @return array
      */
     public function toArray() {
-        return array_filter(get_object_vars($this), function ($v) { return $v !== null; });
+        return array_filter(
+            array(
+                'currentPage' => ($this->currentPage !== null ? $this->currentPage->toArray() : null),
+                'previousPage' => ($this->previousPage !== null ? $this->previousPage->toArray() : null),
+                'nextPage' => ($this->nextPage !== null ? $this->nextPage->toArray() : null),
+                'startedTime' => $this->startedTime,
+                'nbItemsOnCurrentPage' => $this->nbItemsOnCurrentPage,
+                'nbItemsPerPage' => $this->nbItemsPerPage,
+            )
+            , function ($v) { return $v !== null; }
+        );
     }
 
     public function __toString() {
-        return "Pagination{selfUrl=" . $this->selfUrl .
-                            ", prevUrl=" . $this->prevUrl .
-                            ", nextUrl=" . $this->nextUrl .
-                            ", startedTime=" . $this->startedTime .
-                            ", nbItemsOnThisPage=" . $this->nbItemsOnThisPage .
-                            ", page=" . $this->page .
-                            ", nbItemsPerPage=" . $this->nbItemsPerPage . "}";
+        return "Pagination{currentPage=" . $this->currentPage .
+                          ", previousPage=" . $this->previousPage .
+                          ", nextPage=" . $this->nextPage .
+                          ", startedTime=" . $this->startedTime .
+                          ", nbItemsOnCurrentPage=" . $this->nbItemsOnCurrentPage .
+                          ", nbItemsPerPage=" . $this->nbItemsPerPage . "}";
     }
 }

@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,20 +24,24 @@ abstract class AuthAccessPermission implements JsonSerializable  {
     /** @return string */
     public abstract function getType(); 
 
-    public function isShortcut() {
-        return $this->getType() === AuthAccessPermissionShortcut::Type;
+    public function isSimple() {
+        return $this->getType() === AuthAccessPermissionSimple::Type;
     }
 
-    public function isFull() {
-        return $this->getType() === AuthAccessPermissionFull::Type;
+    public function isComplex() {
+        return $this->getType() === AuthAccessPermissionComplex::Type;
     }
 
-    public function isNotShortcut() {
-        return $this->getType() !== AuthAccessPermissionShortcut::Type; 
+    /** @return AuthAccessPermissionSimple | null */
+    public function asSimple() {
+        if($this->getType() == AuthAccessPermissionSimple::Type) return $this;
+        else return null;
     }
 
-    public function isNotFull() {
-        return $this->getType() !== AuthAccessPermissionFull::Type; 
+    /** @return AuthAccessPermissionComplex | null */
+    public function asComplex() {
+        if($this->getType() == AuthAccessPermissionComplex::Type) return $this;
+        else return null;
     }
 
     /**
@@ -59,8 +63,8 @@ abstract class AuthAccessPermission implements JsonSerializable  {
      */
     public static function fromArray(array $array) {
         $type = $array['_type'];
-        if($type === AuthAccessPermissionShortcut::Type || str_ends_with('.' . $type, '.' . AuthAccessPermissionShortcut::Variant)) return AuthAccessPermissionShortcut::fromArray($array);
-        else if($type === AuthAccessPermissionFull::Type || str_ends_with('.' . $type, '.' . AuthAccessPermissionFull::Variant)) return AuthAccessPermissionFull::fromArray($array);
+        if($type === AuthAccessPermissionSimple::Type || str_ends_with('.' . $type, '.' . AuthAccessPermissionSimple::Variant)) return AuthAccessPermissionSimple::fromArray($array);
+        else if($type === AuthAccessPermissionComplex::Type || str_ends_with('.' . $type, '.' . AuthAccessPermissionComplex::Variant)) return AuthAccessPermissionComplex::fromArray($array);
         else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'AuthAccessPermission'" . " Unexpected '_type' = " . $type);
     }
 
@@ -80,5 +84,14 @@ abstract class AuthAccessPermission implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

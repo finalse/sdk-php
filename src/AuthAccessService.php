@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,44 +31,55 @@ class AuthAccessService {
     }
 
     /**
+     * ListAll AuthAccess
+     *
+     * @param Page $page
+     * @return RestCollection
+     */
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/auth-access", $page->getQueryString(), array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
+    }
+
+    /**
      * Create AuthAccess
      *
-     * @param CreateAuthAccessForm $form
+     * @param mixed $form
      * @return AuthAccess
      */
-    public function create(CreateAuthAccessForm $form) {
-        return Http::Post("/" . Sdk::VERSION . "/auth-access", $form->toJson(), "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
+    public function create($form) {
+        return Http::Post("/" . Sdk::VERSION . "/auth-access", json_encode($form), "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
     }
 
     /**
      * Get AuthAccess
      *
-     * @param string $id
+     * @param string $form
      * @return AuthAccess
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/auth-access/" . $id, "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/auth-access/" . $form, "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List AuthAccess
+     * ListAll AuthAccess
      *
-     * @param ListForm $form
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/auth-access", $qs, array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update AuthAccess
      *
-     * @param UpdateAuthAccessForm $form
+     * @param mixed $form
      * @return AuthAccess
      */
-    public function update(UpdateAuthAccessForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/auth-access/" . $form->getId(), $form->toJson(), "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/auth-access/" . $form['id'], json_encode($form), "", array(), function($value){ return AuthAccess::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,20 +24,74 @@ abstract class MfaProcess implements JsonSerializable  {
     /** @return string */
     public abstract function getType(); 
 
-    public function isInitiated() {
-        return $this->getType() === MfaProcessInitiated::Type;
-    }
-
     public function isNotRequired() {
         return $this->getType() === MfaProcessNotRequired::Type;
     }
 
-    public function isNotInitiated() {
-        return $this->getType() !== MfaProcessInitiated::Type; 
+    public function isWaitingToStart() {
+        return $this->getType() === MfaProcessWaitingToStart::Type;
     }
 
-    public function isNotNotRequired() {
-        return $this->getType() !== MfaProcessNotRequired::Type; 
+    public function isStarting() {
+        return $this->getType() === MfaProcessStarting::Type;
+    }
+
+    public function isOneTimePasswordRequired() {
+        return $this->getType() === MfaProcessOneTimePasswordRequired::Type;
+    }
+
+    public function isSecretCodeRequired() {
+        return $this->getType() === MfaProcessSecretCodeRequired::Type;
+    }
+
+    public function isSuccessful() {
+        return $this->getType() === MfaProcessSuccessful::Type;
+    }
+
+    public function isFailure() {
+        return $this->getType() === MfaProcessFailure::Type;
+    }
+
+    /** @return MfaProcessNotRequired | null */
+    public function asNotRequired() {
+        if($this->getType() == MfaProcessNotRequired::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessWaitingToStart | null */
+    public function asWaitingToStart() {
+        if($this->getType() == MfaProcessWaitingToStart::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessStarting | null */
+    public function asStarting() {
+        if($this->getType() == MfaProcessStarting::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessOneTimePasswordRequired | null */
+    public function asOneTimePasswordRequired() {
+        if($this->getType() == MfaProcessOneTimePasswordRequired::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessSecretCodeRequired | null */
+    public function asSecretCodeRequired() {
+        if($this->getType() == MfaProcessSecretCodeRequired::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessSuccessful | null */
+    public function asSuccessful() {
+        if($this->getType() == MfaProcessSuccessful::Type) return $this;
+        else return null;
+    }
+
+    /** @return MfaProcessFailure | null */
+    public function asFailure() {
+        if($this->getType() == MfaProcessFailure::Type) return $this;
+        else return null;
     }
 
     /**
@@ -59,8 +113,13 @@ abstract class MfaProcess implements JsonSerializable  {
      */
     public static function fromArray(array $array) {
         $type = $array['_type'];
-        if($type === MfaProcessInitiated::Type || str_ends_with('.' . $type, '.' . MfaProcessInitiated::Variant)) return MfaProcessInitiated::fromArray($array);
-        else if($type === MfaProcessNotRequired::Type || str_ends_with('.' . $type, '.' . MfaProcessNotRequired::Variant)) return MfaProcessNotRequired::fromArray($array);
+        if($type === MfaProcessNotRequired::Type || str_ends_with('.' . $type, '.' . MfaProcessNotRequired::Variant)) return MfaProcessNotRequired::fromArray($array);
+        else if($type === MfaProcessWaitingToStart::Type || str_ends_with('.' . $type, '.' . MfaProcessWaitingToStart::Variant)) return MfaProcessWaitingToStart::fromArray($array);
+        else if($type === MfaProcessStarting::Type || str_ends_with('.' . $type, '.' . MfaProcessStarting::Variant)) return MfaProcessStarting::fromArray($array);
+        else if($type === MfaProcessOneTimePasswordRequired::Type || str_ends_with('.' . $type, '.' . MfaProcessOneTimePasswordRequired::Variant)) return MfaProcessOneTimePasswordRequired::fromArray($array);
+        else if($type === MfaProcessSecretCodeRequired::Type || str_ends_with('.' . $type, '.' . MfaProcessSecretCodeRequired::Variant)) return MfaProcessSecretCodeRequired::fromArray($array);
+        else if($type === MfaProcessSuccessful::Type || str_ends_with('.' . $type, '.' . MfaProcessSuccessful::Variant)) return MfaProcessSuccessful::fromArray($array);
+        else if($type === MfaProcessFailure::Type || str_ends_with('.' . $type, '.' . MfaProcessFailure::Variant)) return MfaProcessFailure::fromArray($array);
         else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'MfaProcess'" . " Unexpected '_type' = " . $type);
     }
 
@@ -80,5 +139,14 @@ abstract class MfaProcess implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -76,6 +76,20 @@ class MfaProcessNotRequired extends MfaProcess implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array_filter(
+            array(
+                '_type' => self::Variant, 
+            )
+            , function ($v) { return $v !== null; }
+        );
     }
 
     public function __toString() {

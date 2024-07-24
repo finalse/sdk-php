@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ use JsonSerializable;
 class Man implements JsonSerializable  {
 
     /** @var string */
-    protected $number ;
+    protected $alpha ;
 
 
     /** @var string */
@@ -29,19 +29,19 @@ class Man implements JsonSerializable  {
 
     /**
      * Man constructor
-     * @param string $number
+     * @param string $alpha
      */
-    function __construct($number) {
-        $this->number = $number;
+    function __construct($alpha) {
+        $this->alpha = $alpha;
     }
 
     /**
-     * Getter of the field 'number'.
+     * Getter of the field 'alpha'.
      *
      * @return string
      */
-    public function getNumber() {
-        return $this->number;
+    public function getAlpha() {
+        return $this->alpha;
     }
 
     /**
@@ -52,13 +52,13 @@ class Man implements JsonSerializable  {
     public function getType() { return self::Type; } 
 
     /**
-     * Immutable update. Return a new Man where the field 'number' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Man where the field 'alpha' has been updated with the value passed as parameter.
      *
-     * @param string $number
+     * @param string $alpha
      * @return Man
      */
-    public function withNumber($number) {
-        return new Man($number);
+    public function withAlpha($alpha) {
+        return new Man($alpha);
     }
 
     /**
@@ -79,7 +79,7 @@ class Man implements JsonSerializable  {
      * @return Man
      */
     public static function fromArray(array $array) {
-        return new Man($array['number']);
+        return new Man($array['alpha']);
     }
 
     /**
@@ -108,13 +108,13 @@ class Man implements JsonSerializable  {
     public function toArray() {
         return array_filter(
             array(
-                'number' => $this->number,
+                'alpha' => $this->alpha,
             )
             , function ($v) { return $v !== null; }
         );
     }
 
     public function __toString() {
-        return "Man{number=" . $this->number . "}";
+        return "Man{alpha=" . $this->alpha . "}";
     }
 }

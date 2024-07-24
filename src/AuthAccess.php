@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ class AuthAccess implements JsonSerializable  {
     protected $createdTime ;
 
     /** @var string */
+    protected $name ;
+
+    /** @var string */
     protected $token ;
 
     /** @var AuthAccessPermission */
@@ -37,6 +40,12 @@ class AuthAccess implements JsonSerializable  {
 
     /** @var string */
     protected $secretKey ;
+
+    /** @var boolean */
+    protected $isEnabled ;
+
+    /** @var Creator */
+    protected $creator ;
 
     /** @var string | null */
     protected $description ;
@@ -56,9 +65,12 @@ class AuthAccess implements JsonSerializable  {
      * @param string $id
      * @param string $url
      * @param UTCDateTime $createdTime
+     * @param string $name
      * @param string $token
      * @param AuthAccessPermission $permission
      * @param string $secretKey
+     * @param boolean $isEnabled
+     * @param Creator $creator
      * @param string | null $description
      * @param string | null $foreignId
      * @param string | null $foreignData
@@ -66,18 +78,24 @@ class AuthAccess implements JsonSerializable  {
     function __construct($id,
                          $url,
                          UTCDateTime $createdTime,
+                         $name,
                          $token,
                          AuthAccessPermission $permission,
                          $secretKey,
+                         $isEnabled,
+                         Creator $creator,
                          $description = null,
                          $foreignId = null,
                          $foreignData = null) {
         $this->id = $id;
         $this->url = $url;
         $this->createdTime = $createdTime;
+        $this->name = $name;
         $this->token = $token;
         $this->permission = $permission;
         $this->secretKey = $secretKey;
+        $this->isEnabled = $isEnabled;
+        $this->creator = $creator;
         $this->description = $description;
         $this->foreignId = $foreignId;
         $this->foreignData = $foreignData;
@@ -111,6 +129,15 @@ class AuthAccess implements JsonSerializable  {
     }
 
     /**
+     * Getter of the field 'name'.
+     *
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
      * Getter of the field 'token'.
      *
      * @return string
@@ -135,6 +162,24 @@ class AuthAccess implements JsonSerializable  {
      */
     public function getSecretKey() {
         return $this->secretKey;
+    }
+
+    /**
+     * Getter of the field 'isEnabled'.
+     *
+     * @return boolean
+     */
+    public function isEnabled() {
+        return $this->isEnabled;
+    }
+
+    /**
+     * Getter of the field 'creator'.
+     *
+     * @return Creator
+     */
+    public function getCreator() {
+        return $this->creator;
     }
 
     /**
@@ -178,8 +223,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withId($id) {
-        return new AuthAccess($id, $this->url, $this->createdTime, $this->token, $this->permission,
-                              $this->secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -189,8 +235,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withUrl($url) {
-        return new AuthAccess($this->id, $url, $this->createdTime, $this->token, $this->permission,
-                              $this->secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -201,8 +248,21 @@ class AuthAccess implements JsonSerializable  {
      */
     public function withCreatedTime(UTCDateTime $createdTime) {
         assert($this->createdTime != null, "In class AuthAccess the param 'createdTime' of type UTCDateTime can not be null");
-        return new AuthAccess($this->id, $this->url, $createdTime, $this->token, $this->permission,
-                              $this->secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new AuthAccess where the field 'name' has been updated with the value passed as parameter.
+     *
+     * @param string $name
+     * @return AuthAccess
+     */
+    public function withName($name) {
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -212,8 +272,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withToken($token) {
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $token, $this->permission,
-                              $this->secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -224,8 +285,9 @@ class AuthAccess implements JsonSerializable  {
      */
     public function withPermission(AuthAccessPermission $permission) {
         assert($this->permission != null, "In class AuthAccess the param 'permission' of type AuthAccessPermission can not be null");
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->token, $permission,
-                              $this->secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -235,8 +297,34 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withSecretKey($secretKey) {
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->token, $this->permission,
-                              $secretKey, $this->description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new AuthAccess where the field 'isEnabled' has been updated with the value passed as parameter.
+     *
+     * @param boolean $isEnabled
+     * @return AuthAccess
+     */
+    public function withIsEnabled($isEnabled) {
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new AuthAccess where the field 'creator' has been updated with the value passed as parameter.
+     *
+     * @param Creator $creator
+     * @return AuthAccess
+     */
+    public function withCreator(Creator $creator) {
+        assert($this->creator != null, "In class AuthAccess the param 'creator' of type Creator can not be null");
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $creator,
+                              $this->description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -246,8 +334,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withDescription($description) {
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->token, $this->permission,
-                              $this->secretKey, $description, $this->foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $description, $this->foreignId, $this->foreignData);
     }
 
     /**
@@ -257,8 +346,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withForeignId($foreignId) {
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->token, $this->permission,
-                              $this->secretKey, $this->description, $foreignId, $this->foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $foreignId, $this->foreignData);
     }
 
     /**
@@ -268,8 +358,9 @@ class AuthAccess implements JsonSerializable  {
      * @return AuthAccess
      */
     public function withForeignData($foreignData) {
-        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->token, $this->permission,
-                              $this->secretKey, $this->description, $this->foreignId, $foreignData);
+        return new AuthAccess($this->id, $this->url, $this->createdTime, $this->name, $this->token,
+                              $this->permission, $this->secretKey, $this->isEnabled, $this->creator,
+                              $this->description, $this->foreignId, $foreignData);
     }
 
     /**
@@ -293,9 +384,12 @@ class AuthAccess implements JsonSerializable  {
         return new AuthAccess($array['id'],
                               $array['url'],
                               UTCDateTime::fromArray($array['createdTime']),
+                              $array['name'],
                               $array['token'],
                               AuthAccessPermission::fromArray($array['permission']),
                               $array['secretKey'],
+                              $array['isEnabled'],
+                              Creator::fromArray($array['creator']),
                               (isset($array['description']) ? $array['description'] : null),
                               (isset($array['foreignId']) ? $array['foreignId'] : null),
                               (isset($array['foreignData']) ? $array['foreignData'] : null));
@@ -330,9 +424,12 @@ class AuthAccess implements JsonSerializable  {
                 'id' => $this->id,
                 'url' => $this->url,
                 'createdTime' => ($this->createdTime !== null ? $this->createdTime->toArray() : null),
+                'name' => $this->name,
                 'token' => $this->token,
                 'permission' => ($this->permission !== null ? $this->permission->toArray() : null),
                 'secretKey' => $this->secretKey,
+                'isEnabled' => $this->isEnabled,
+                'creator' => ($this->creator !== null ? $this->creator->toArray() : null),
                 'description' => $this->description,
                 'foreignId' => $this->foreignId,
                 'foreignData' => $this->foreignData,
@@ -345,9 +442,12 @@ class AuthAccess implements JsonSerializable  {
         return "AuthAccess{id=" . $this->id .
                           ", url=" . $this->url .
                           ", createdTime=" . $this->createdTime .
+                          ", name=" . $this->name .
                           ", token=" . $this->token .
                           ", permission=" . $this->permission .
                           ", secretKey=******" .
+                          ", isEnabled=" . $this->isEnabled .
+                          ", creator=" . $this->creator .
                           ", description=" . $this->description .
                           ", foreignId=" . $this->foreignId .
                           ", foreignData=" . $this->foreignData . "}";

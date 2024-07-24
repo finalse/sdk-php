@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -160,5 +160,22 @@ class RestCollection implements JsonSerializable  {
         return "RestCollection{url=" . $this->url .
             ", pagination=" . $this->pagination .
             ", items=" . $this->items . "}";
+    }
+
+    public function toArray()
+    {
+        return $this->items;
+    }
+
+    /** @return boolean  */
+    public function hasNextPage()
+    {
+        return $this->pagination->getNextPage() !== null;
+    }
+
+    /** @return boolean  */
+    public function hasPreviousPage()
+    {
+        return $this->pagination->getPreviousPage() !== null;
     }
 }

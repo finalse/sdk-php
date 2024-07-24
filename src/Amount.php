@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ class Amount implements JsonSerializable  {
     /** @var number */
     protected $value ;
 
-    /** @var PartialCurrency */
+    /** @var AmountCurrency */
     protected $currency ;
 
 
@@ -33,9 +33,9 @@ class Amount implements JsonSerializable  {
     /**
      * Amount constructor
      * @param number $value
-     * @param PartialCurrency $currency
+     * @param AmountCurrency $currency
      */
-    function __construct($value, PartialCurrency $currency) {
+    function __construct($value, AmountCurrency $currency) {
         $this->value = $value;
         $this->currency = $currency;
     }
@@ -52,7 +52,7 @@ class Amount implements JsonSerializable  {
     /**
      * Getter of the field 'currency'.
      *
-     * @return PartialCurrency
+     * @return AmountCurrency
      */
     public function getCurrency() {
         return $this->currency;
@@ -78,11 +78,11 @@ class Amount implements JsonSerializable  {
     /**
      * Immutable update. Return a new Amount where the field 'currency' has been updated with the value passed as parameter.
      *
-     * @param PartialCurrency $currency
+     * @param AmountCurrency $currency
      * @return Amount
      */
-    public function withCurrency(PartialCurrency $currency) {
-        assert($this->currency != null, "In class Amount the param 'currency' of type PartialCurrency can not be null");
+    public function withCurrency(AmountCurrency $currency) {
+        assert($this->currency != null, "In class Amount the param 'currency' of type AmountCurrency can not be null");
         return new Amount($this->value, $currency);
     }
 
@@ -105,7 +105,7 @@ class Amount implements JsonSerializable  {
      */
     public static function fromArray(array $array) {
         return new Amount($array['value'],
-                          PartialCurrency::fromArray($array['currency']));
+                          AmountCurrency::fromArray($array['currency']));
     }
 
     /**

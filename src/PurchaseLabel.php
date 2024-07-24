@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -88,26 +88,6 @@ class PurchaseLabel implements JsonSerializable {
             if($s->value === $value) return $s;
         }
         return null;
-    }
-
-    public function isNotBuy() {
-        return $this->value !== "Buy";
-    }
-
-    public function isNotDonate() {
-        return $this->value !== "Donate";
-    }
-
-    public function isNotParticipate() {
-        return $this->value !== "Participate";
-    }
-
-    public function isNotPay() {
-        return $this->value !== "Pay";
-    }
-
-    public function isNotSubscribe() {
-        return $this->value !== "Subscribe";
     }
 
     public function isBuy() {

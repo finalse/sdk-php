@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ class Timestamp implements JsonSerializable  {
     /** @var float */
     protected $milliseconds ;
 
+    /** @var float */
+    protected $seconds ;
+
 
     /** @var string */
     const Type = "Timestamp";
@@ -30,9 +33,11 @@ class Timestamp implements JsonSerializable  {
     /**
      * Timestamp constructor
      * @param float $milliseconds
+     * @param float $seconds
      */
-    function __construct($milliseconds) {
+    function __construct($milliseconds, $seconds) {
         $this->milliseconds = $milliseconds;
+        $this->seconds = $seconds;
     }
 
     /**
@@ -42,6 +47,15 @@ class Timestamp implements JsonSerializable  {
      */
     public function getMilliseconds() {
         return $this->milliseconds;
+    }
+
+    /**
+     * Getter of the field 'seconds'.
+     *
+     * @return float
+     */
+    public function getSeconds() {
+        return $this->seconds;
     }
 
     /**
@@ -58,7 +72,17 @@ class Timestamp implements JsonSerializable  {
      * @return Timestamp
      */
     public function withMilliseconds($milliseconds) {
-        return new Timestamp($milliseconds);
+        return new Timestamp($milliseconds, $this->seconds);
+    }
+
+    /**
+     * Immutable update. Return a new Timestamp where the field 'seconds' has been updated with the value passed as parameter.
+     *
+     * @param float $seconds
+     * @return Timestamp
+     */
+    public function withSeconds($seconds) {
+        return new Timestamp($this->milliseconds, $seconds);
     }
 
     /**
@@ -79,7 +103,8 @@ class Timestamp implements JsonSerializable  {
      * @return Timestamp
      */
     public static function fromArray(array $array) {
-        return new Timestamp($array['milliseconds']);
+        return new Timestamp($array['milliseconds'],
+                             $array['seconds']);
     }
 
     /**
@@ -109,12 +134,14 @@ class Timestamp implements JsonSerializable  {
         return array_filter(
             array(
                 'milliseconds' => $this->milliseconds,
+                'seconds' => $this->seconds,
             )
             , function ($v) { return $v !== null; }
         );
     }
 
     public function __toString() {
-        return "Timestamp{milliseconds=" . $this->milliseconds . "}";
+        return "Timestamp{milliseconds=" . $this->milliseconds .
+                         ", seconds=" . $this->seconds . "}";
     }
 }

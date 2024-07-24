@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,16 +36,22 @@ abstract class SecurePayPurpose implements JsonSerializable  {
         return $this->getType() === SecurePayPurposePurchase::Type;
     }
 
-    public function isNotSend() {
-        return $this->getType() !== SecurePayPurposeSend::Type; 
+    /** @return SecurePayPurposeSend | null */
+    public function asSend() {
+        if($this->getType() == SecurePayPurposeSend::Type) return $this;
+        else return null;
     }
 
-    public function isNotReceive() {
-        return $this->getType() !== SecurePayPurposeReceive::Type; 
+    /** @return SecurePayPurposeReceive | null */
+    public function asReceive() {
+        if($this->getType() == SecurePayPurposeReceive::Type) return $this;
+        else return null;
     }
 
-    public function isNotPurchase() {
-        return $this->getType() !== SecurePayPurposePurchase::Type; 
+    /** @return SecurePayPurposePurchase | null */
+    public function asPurchase() {
+        if($this->getType() == SecurePayPurposePurchase::Type) return $this;
+        else return null;
     }
 
     /**
@@ -89,5 +95,14 @@ abstract class SecurePayPurpose implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

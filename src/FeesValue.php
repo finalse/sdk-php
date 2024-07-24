@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ use JsonSerializable;
 class FeesValue implements JsonSerializable  {
 
     /** @var number */
-    protected $fixed ;
+    protected $fixe ;
 
     /** @var number */
     protected $percent ;
@@ -32,21 +32,21 @@ class FeesValue implements JsonSerializable  {
 
     /**
      * FeesValue constructor
-     * @param number $fixed
+     * @param number $fixe
      * @param number $percent
      */
-    function __construct($fixed, $percent) {
-        $this->fixed = $fixed;
+    function __construct($fixe, $percent) {
+        $this->fixe = $fixe;
         $this->percent = $percent;
     }
 
     /**
-     * Getter of the field 'fixed'.
+     * Getter of the field 'fixe'.
      *
      * @return number
      */
-    public function getFixed() {
-        return $this->fixed;
+    public function getFixe() {
+        return $this->fixe;
     }
 
     /**
@@ -66,13 +66,13 @@ class FeesValue implements JsonSerializable  {
     public function getType() { return self::Type; } 
 
     /**
-     * Immutable update. Return a new FeesValue where the field 'fixed' has been updated with the value passed as parameter.
+     * Immutable update. Return a new FeesValue where the field 'fixe' has been updated with the value passed as parameter.
      *
-     * @param number $fixed
+     * @param number $fixe
      * @return FeesValue
      */
-    public function withFixed($fixed) {
-        return new FeesValue($fixed, $this->percent);
+    public function withFixe($fixe) {
+        return new FeesValue($fixe, $this->percent);
     }
 
     /**
@@ -82,7 +82,7 @@ class FeesValue implements JsonSerializable  {
      * @return FeesValue
      */
     public function withPercent($percent) {
-        return new FeesValue($this->fixed, $percent);
+        return new FeesValue($this->fixe, $percent);
     }
 
     /**
@@ -103,7 +103,7 @@ class FeesValue implements JsonSerializable  {
      * @return FeesValue
      */
     public static function fromArray(array $array) {
-        return new FeesValue($array['fixed'],
+        return new FeesValue($array['fixe'],
                              $array['percent']);
     }
 
@@ -133,7 +133,7 @@ class FeesValue implements JsonSerializable  {
     public function toArray() {
         return array_filter(
             array(
-                'fixed' => $this->fixed,
+                'fixe' => $this->fixe,
                 'percent' => $this->percent,
             )
             , function ($v) { return $v !== null; }
@@ -141,7 +141,7 @@ class FeesValue implements JsonSerializable  {
     }
 
     public function __toString() {
-        return "FeesValue{fixed=" . $this->fixed .
+        return "FeesValue{fixe=" . $this->fixe .
                          ", percent=" . $this->percent . "}";
     }
 }

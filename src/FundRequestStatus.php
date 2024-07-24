@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,36 +24,64 @@ abstract class FundRequestStatus implements JsonSerializable  {
     /** @return string */
     public abstract function getType(); 
 
-    public function isWaiting() {
-        return $this->getType() === FundRequestStatusWaiting::Type;
+    public function isWaitingToStart() {
+        return $this->getType() === FundRequestStatusWaitingToStart::Type;
+    }
+
+    public function isStarting() {
+        return $this->getType() === FundRequestStatusStarting::Type;
+    }
+
+    public function isStarted() {
+        return $this->getType() === FundRequestStatusStarted::Type;
     }
 
     public function isProcessing() {
         return $this->getType() === FundRequestStatusProcessing::Type;
     }
 
-    public function isCompleted() {
-        return $this->getType() === FundRequestStatusCompleted::Type;
+    public function isFailure() {
+        return $this->getType() === FundRequestStatusFailure::Type;
     }
 
-    public function isCancelled() {
-        return $this->getType() === FundRequestStatusCancelled::Type;
+    public function isSuccessful() {
+        return $this->getType() === FundRequestStatusSuccessful::Type;
     }
 
-    public function isNotWaiting() {
-        return $this->getType() !== FundRequestStatusWaiting::Type; 
+    /** @return FundRequestStatusWaitingToStart | null */
+    public function asWaitingToStart() {
+        if($this->getType() == FundRequestStatusWaitingToStart::Type) return $this;
+        else return null;
     }
 
-    public function isNotProcessing() {
-        return $this->getType() !== FundRequestStatusProcessing::Type; 
+    /** @return FundRequestStatusStarting | null */
+    public function asStarting() {
+        if($this->getType() == FundRequestStatusStarting::Type) return $this;
+        else return null;
     }
 
-    public function isNotCompleted() {
-        return $this->getType() !== FundRequestStatusCompleted::Type; 
+    /** @return FundRequestStatusStarted | null */
+    public function asStarted() {
+        if($this->getType() == FundRequestStatusStarted::Type) return $this;
+        else return null;
     }
 
-    public function isNotCancelled() {
-        return $this->getType() !== FundRequestStatusCancelled::Type; 
+    /** @return FundRequestStatusProcessing | null */
+    public function asProcessing() {
+        if($this->getType() == FundRequestStatusProcessing::Type) return $this;
+        else return null;
+    }
+
+    /** @return FundRequestStatusFailure | null */
+    public function asFailure() {
+        if($this->getType() == FundRequestStatusFailure::Type) return $this;
+        else return null;
+    }
+
+    /** @return FundRequestStatusSuccessful | null */
+    public function asSuccessful() {
+        if($this->getType() == FundRequestStatusSuccessful::Type) return $this;
+        else return null;
     }
 
     /**
@@ -75,10 +103,12 @@ abstract class FundRequestStatus implements JsonSerializable  {
      */
     public static function fromArray(array $array) {
         $type = $array['_type'];
-        if($type === FundRequestStatusWaiting::Type || str_ends_with('.' . $type, '.' . FundRequestStatusWaiting::Variant)) return FundRequestStatusWaiting::fromArray($array);
+        if($type === FundRequestStatusWaitingToStart::Type || str_ends_with('.' . $type, '.' . FundRequestStatusWaitingToStart::Variant)) return FundRequestStatusWaitingToStart::fromArray($array);
+        else if($type === FundRequestStatusStarting::Type || str_ends_with('.' . $type, '.' . FundRequestStatusStarting::Variant)) return FundRequestStatusStarting::fromArray($array);
+        else if($type === FundRequestStatusStarted::Type || str_ends_with('.' . $type, '.' . FundRequestStatusStarted::Variant)) return FundRequestStatusStarted::fromArray($array);
         else if($type === FundRequestStatusProcessing::Type || str_ends_with('.' . $type, '.' . FundRequestStatusProcessing::Variant)) return FundRequestStatusProcessing::fromArray($array);
-        else if($type === FundRequestStatusCompleted::Type || str_ends_with('.' . $type, '.' . FundRequestStatusCompleted::Variant)) return FundRequestStatusCompleted::fromArray($array);
-        else if($type === FundRequestStatusCancelled::Type || str_ends_with('.' . $type, '.' . FundRequestStatusCancelled::Variant)) return FundRequestStatusCancelled::fromArray($array);
+        else if($type === FundRequestStatusFailure::Type || str_ends_with('.' . $type, '.' . FundRequestStatusFailure::Variant)) return FundRequestStatusFailure::fromArray($array);
+        else if($type === FundRequestStatusSuccessful::Type || str_ends_with('.' . $type, '.' . FundRequestStatusSuccessful::Variant)) return FundRequestStatusSuccessful::fromArray($array);
         else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'FundRequestStatus'" . " Unexpected '_type' = " . $type);
     }
 
@@ -98,5 +128,14 @@ abstract class FundRequestStatus implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array();
     }
 }

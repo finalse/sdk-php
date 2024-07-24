@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
 
 use JsonSerializable;
 
-abstract class Transfer implements JsonSerializable  {
-
-
+class Transfer implements JsonSerializable  {
 
     /** @var string */
     protected $id ;
@@ -28,23 +26,38 @@ abstract class Transfer implements JsonSerializable  {
     /** @var string */
     protected $url ;
 
+    /** @var Creator */
+    protected $creator ;
+
     /** @var UTCDateTime */
     protected $createdTime ;
 
-    /** @var H1Descriptor */
+    /** @var UTCDateTime | null */
+    protected $completedTime ;
+
+    /** @var H1Descriptor | null */
     protected $h1Descriptor ;
 
-    /** @var MoneyAccount */
-    protected $origin ;
+    /** @var Sending */
+    protected $sending ;
 
-    /** @var TransferDestination */
+    /** @var Source */
+    protected $source ;
+
+    /** @var Destination */
     protected $destination ;
 
     /** @var Fees */
     protected $fees ;
 
-    /** @var Sending */
-    protected $sending ;
+    /** @var LightAttempt */
+    protected $attempt ;
+
+    /** @var Amount */
+    protected $amount ;
+
+    /** @var TransferStatus */
+    protected $status ;
 
     /** @var string | null */
     protected $description ;
@@ -55,71 +68,61 @@ abstract class Transfer implements JsonSerializable  {
     /** @var string | null */
     protected $foreignData ;
 
-    /** @return string */
-    public abstract function getType(); 
 
-    public function isUnitary() {
-        return $this->getType() === TransferUnitary::Type;
-    }
+    /** @var string */
+    const Type = "Transfer";
 
-    public function isScaled() {
-        return $this->getType() === TransferScaled::Type;
-    }
-
-    public function isCaution() {
-        return $this->getType() === TransferCaution::Type;
-    }
-
-    public function isProvision() {
-        return $this->getType() === TransferProvision::Type;
-    }
-
-    public function isInstallment() {
-        return $this->getType() === TransferInstallment::Type;
-    }
-
-    public function isPrePaid() {
-        return $this->getType() === TransferPrePaid::Type;
-    }
-
-    public function isPostPaid() {
-        return $this->getType() === TransferPostPaid::Type;
-    }
-
-    public function isPreAuthorized() {
-        return $this->getType() === TransferPreAuthorized::Type;
-    }
-
-    public function isNotUnitary() {
-        return $this->getType() !== TransferUnitary::Type; 
-    }
-
-    public function isNotScaled() {
-        return $this->getType() !== TransferScaled::Type; 
-    }
-
-    public function isNotCaution() {
-        return $this->getType() !== TransferCaution::Type; 
-    }
-
-    public function isNotProvision() {
-        return $this->getType() !== TransferProvision::Type; 
-    }
-
-    public function isNotInstallment() {
-        return $this->getType() !== TransferInstallment::Type; 
-    }
-
-    public function isNotPrePaid() {
-        return $this->getType() !== TransferPrePaid::Type; 
-    }
-
-    public function isNotPostPaid() {
-        return $this->getType() !== TransferPostPaid::Type; 
-    }
-
-    public function isNotPreAuthorized() {
-        return $this->getType() !== TransferPreAuthorized::Type; 
+    /**
+     * Transfer constructor
+     * @param string $id
+     * @param string $url
+     * @param Creator $creator
+     * @param UTCDateTime $createdTime
+     * @param UTCDateTime | null $completedTime
+     * @param H1Descriptor | null $h1Descriptor
+     * @param Sending $sending
+     * @param Source $source
+     * @param Destination $destination
+     * @param Fees $fees
+     * @param LightAttempt $attempt
+     * @param Amount $amount
+     * @param TransferStatus $status
+     * @param string | null $description
+     * @param string | null $foreignId
+     * @param string | null $foreignData
+     */
+    function __construct($id,
+                         $url,
+                         Creator $creator,
+                         UTCDateTime $createdTime,
+                         $completedTime = null,
+                         $h1Descriptor = null,
+                         Sending $sending,
+                         Source $source,
+                         Destination $destination,
+                         Fees $fees,
+                         LightAttempt $attempt,
+                         Amount $amount,
+                         TransferStatus $status,
+                         $description = null,
+                         $foreignId = null,
+                         $foreignData = null) {
+        $this->id = $id;
+        $this->url = $url;
+        $this->creator = $creator;
+        $this->createdTime = $createdTime;
+        $this->completedTime = $completedTime;
+        $this->h1Descriptor = $h1Descriptor;
+        $this->sending = $sending;
+        $this->source = $source;
+        $this->destination = $destination;
+        $this->fees = $fees;
+        $this->attempt = $attempt;
+        $this->amount = $amount;
+        $this->status = $status;
+        $this->description = $description;
+        $this->foreignId = $foreignId;
+        $this->foreignData = $foreignData;
     }
 
     /**
@@ -141,6 +144,15 @@ abstract class Transfer implements JsonSerializable  {
     }
 
     /**
+     * Getter of the field 'creator'.
+     *
+     * @return Creator
+     */
+    public function getCreator() {
+        return $this->creator;
+    }
+
+    /**
      * Getter of the field 'createdTime'.
      *
      * @return UTCDateTime
@@ -150,27 +162,45 @@ abstract class Transfer implements JsonSerializable  {
     }
 
     /**
+     * Getter of the field 'completedTime'.
+     *
+     * @return UTCDateTime | null
+     */
+    public function getCompletedTime() {
+        return $this->completedTime;
+    }
+
+    /**
      * Getter of the field 'h1Descriptor'.
      *
-     * @return H1Descriptor
+     * @return H1Descriptor | null
      */
     public function getH1Descriptor() {
         return $this->h1Descriptor;
     }
 
     /**
-     * Getter of the field 'origin'.
+     * Getter of the field 'sending'.
      *
-     * @return MoneyAccount
+     * @return Sending
      */
-    public function getOrigin() {
-        return $this->origin;
+    public function getSending() {
+        return $this->sending;
+    }
+
+    /**
+     * Getter of the field 'source'.
+     *
+     * @return Source
+     */
+    public function getSource() {
+        return $this->source;
     }
 
     /**
      * Getter of the field 'destination'.
      *
-     * @return TransferDestination
+     * @return Destination
      */
     public function getDestination() {
         return $this->destination;
@@ -186,12 +216,30 @@ abstract class Transfer implements JsonSerializable  {
     }
 
     /**
-     * Getter of the field 'sending'.
+     * Getter of the field 'attempt'.
      *
-     * @return Sending
+     * @return LightAttempt
      */
-    public function getSending() {
-        return $this->sending;
+    public function getAttempt() {
+        return $this->attempt;
+    }
+
+    /**
+     * Getter of the field 'amount'.
+     *
+     * @return Amount
+     */
+    public function getAmount() {
+        return $this->amount;
+    }
+
+    /**
+     * Getter of the field 'status'.
+     *
+     * @return TransferStatus
+     */
+    public function getStatus() {
+        return $this->status;
     }
 
     /**
@@ -222,6 +270,232 @@ abstract class Transfer implements JsonSerializable  {
     }
 
     /**
+     * Return the type of this Object.
+     *
+     * @return string
+     */
+    public function getType() { return self::Type; } 
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'id' has been updated with the value passed as parameter.
+     *
+     * @param string $id
+     * @return Transfer
+     */
+    public function withId($id) {
+        return new Transfer($id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'url' has been updated with the value passed as parameter.
+     *
+     * @param string $url
+     * @return Transfer
+     */
+    public function withUrl($url) {
+        return new Transfer($this->id, $url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'creator' has been updated with the value passed as parameter.
+     *
+     * @param Creator $creator
+     * @return Transfer
+     */
+    public function withCreator(Creator $creator) {
+        assert($this->creator != null, "In class Transfer the param 'creator' of type Creator can not be null");
+        return new Transfer($this->id, $this->url, $creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'createdTime' has been updated with the value passed as parameter.
+     *
+     * @param UTCDateTime $createdTime
+     * @return Transfer
+     */
+    public function withCreatedTime(UTCDateTime $createdTime) {
+        assert($this->createdTime != null, "In class Transfer the param 'createdTime' of type UTCDateTime can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'completedTime' has been updated with the value passed as parameter.
+     *
+     * @param UTCDateTime | null $completedTime
+     * @return Transfer
+     */
+    public function withCompletedTime($completedTime) {
+        assert($this->completedTime != null, "In class Transfer the param 'completedTime' of type UTCDateTime | null can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'h1Descriptor' has been updated with the value passed as parameter.
+     *
+     * @param H1Descriptor | null $h1Descriptor
+     * @return Transfer
+     */
+    public function withH1Descriptor($h1Descriptor) {
+        assert($this->h1Descriptor != null, "In class Transfer the param 'h1Descriptor' of type H1Descriptor | null can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'sending' has been updated with the value passed as parameter.
+     *
+     * @param Sending $sending
+     * @return Transfer
+     */
+    public function withSending(Sending $sending) {
+        assert($this->sending != null, "In class Transfer the param 'sending' of type Sending can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'source' has been updated with the value passed as parameter.
+     *
+     * @param Source $source
+     * @return Transfer
+     */
+    public function withSource(Source $source) {
+        assert($this->source != null, "In class Transfer the param 'source' of type Source can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'destination' has been updated with the value passed as parameter.
+     *
+     * @param Destination $destination
+     * @return Transfer
+     */
+    public function withDestination(Destination $destination) {
+        assert($this->destination != null, "In class Transfer the param 'destination' of type Destination can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'fees' has been updated with the value passed as parameter.
+     *
+     * @param Fees $fees
+     * @return Transfer
+     */
+    public function withFees(Fees $fees) {
+        assert($this->fees != null, "In class Transfer the param 'fees' of type Fees can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'attempt' has been updated with the value passed as parameter.
+     *
+     * @param LightAttempt $attempt
+     * @return Transfer
+     */
+    public function withAttempt(LightAttempt $attempt) {
+        assert($this->attempt != null, "In class Transfer the param 'attempt' of type LightAttempt can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'amount' has been updated with the value passed as parameter.
+     *
+     * @param Amount $amount
+     * @return Transfer
+     */
+    public function withAmount(Amount $amount) {
+        assert($this->amount != null, "In class Transfer the param 'amount' of type Amount can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $amount, $this->status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'status' has been updated with the value passed as parameter.
+     *
+     * @param TransferStatus $status
+     * @return Transfer
+     */
+    public function withStatus(TransferStatus $status) {
+        assert($this->status != null, "In class Transfer the param 'status' of type TransferStatus can not be null");
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $status, $this->description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'description' has been updated with the value passed as parameter.
+     *
+     * @param string | null $description
+     * @return Transfer
+     */
+    public function withDescription($description) {
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $description,
+                            $this->foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'foreignId' has been updated with the value passed as parameter.
+     *
+     * @param string | null $foreignId
+     * @return Transfer
+     */
+    public function withForeignId($foreignId) {
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $foreignId, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transfer where the field 'foreignData' has been updated with the value passed as parameter.
+     *
+     * @param string | null $foreignData
+     * @return Transfer
+     */
+    public function withForeignData($foreignData) {
+        return new Transfer($this->id, $this->url, $this->creator, $this->createdTime, $this->completedTime,
+                            $this->h1Descriptor, $this->sending, $this->source, $this->destination,
+                            $this->fees, $this->attempt, $this->amount, $this->status, $this->description,
+                            $this->foreignId, $foreignData);
+    }
+
+    /**
      * Create Transfer from JSON string
      *
      * @param string $json
@@ -239,16 +513,22 @@ abstract class Transfer implements JsonSerializable  {
      * @return Transfer
      */
     public static function fromArray(array $array) {
-        $type = $array['_type'];
-        if($type === TransferUnitary::Type || str_ends_with('.' . $type, '.' . TransferUnitary::Variant)) return TransferUnitary::fromArray($array);
-        else if($type === TransferScaled::Type || str_ends_with('.' . $type, '.' . TransferScaled::Variant)) return TransferScaled::fromArray($array);
-        else if($type === TransferCaution::Type || str_ends_with('.' . $type, '.' . TransferCaution::Variant)) return TransferCaution::fromArray($array);
-        else if($type === TransferProvision::Type || str_ends_with('.' . $type, '.' . TransferProvision::Variant)) return TransferProvision::fromArray($array);
-        else if($type === TransferInstallment::Type || str_ends_with('.' . $type, '.' . TransferInstallment::Variant)) return TransferInstallment::fromArray($array);
-        else if($type === TransferPrePaid::Type || str_ends_with('.' . $type, '.' . TransferPrePaid::Variant)) return TransferPrePaid::fromArray($array);
-        else if($type === TransferPostPaid::Type || str_ends_with('.' . $type, '.' . TransferPostPaid::Variant)) return TransferPostPaid::fromArray($array);
-        else if($type === TransferPreAuthorized::Type || str_ends_with('.' . $type, '.' . TransferPreAuthorized::Variant)) return TransferPreAuthorized::fromArray($array);
-        else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'Transfer'" . " Unexpected '_type' = " . $type);
+        return new Transfer($array['id'],
+                            $array['url'],
+                            Creator::fromArray($array['creator']),
+                            UTCDateTime::fromArray($array['createdTime']),
+                            (isset($array['completedTime']) ? UTCDateTime::fromArray($array['completedTime']) : null),
+                            (isset($array['h1Descriptor']) ? H1Descriptor::fromArray($array['h1Descriptor']) : null),
+                            Sending::fromString($array['sending']),
+                            Source::fromArray($array['source']),
+                            Destination::fromArray($array['destination']),
+                            Fees::fromArray($array['fees']),
+                            LightAttempt::fromArray($array['attempt']),
+                            Amount::fromArray($array['amount']),
+                            TransferStatus::fromArray($array['status']),
+                            (isset($array['description']) ? $array['description'] : null),
+                            (isset($array['foreignId']) ? $array['foreignId'] : null),
+                            (isset($array['foreignData']) ? $array['foreignData'] : null));
     }
 
     /**
@@ -270,90 +550,50 @@ abstract class Transfer implements JsonSerializable  {
     }
 
     /**
-     * Immutable update. Return a new Transfer where the field 'id' has been updated with the value passed as parameter.
+     * Return associative array representing this object
      *
-     * @param string $id
-     * @return Transfer
+     * @return array
      */
-    public abstract function withId($id);
+    public function toArray() {
+        return array_filter(
+            array(
+                'id' => $this->id,
+                'url' => $this->url,
+                'creator' => ($this->creator !== null ? $this->creator->toArray() : null),
+                'createdTime' => ($this->createdTime !== null ? $this->createdTime->toArray() : null),
+                'completedTime' => ($this->completedTime !== null ? $this->completedTime->toArray() : null),
+                'h1Descriptor' => ($this->h1Descriptor !== null ? $this->h1Descriptor->toArray() : null),
+                'sending' => ((string) $this->sending),
+                'source' => ($this->source !== null ? $this->source->toArray() : null),
+                'destination' => ($this->destination !== null ? $this->destination->toArray() : null),
+                'fees' => ($this->fees !== null ? $this->fees->toArray() : null),
+                'attempt' => ($this->attempt !== null ? $this->attempt->toArray() : null),
+                'amount' => ($this->amount !== null ? $this->amount->toArray() : null),
+                'status' => ($this->status !== null ? $this->status->toArray() : null),
+                'description' => $this->description,
+                'foreignId' => $this->foreignId,
+                'foreignData' => $this->foreignData,
+            )
+            , function ($v) { return $v !== null; }
+        );
+    }
 
-    /**
-     * Immutable update. Return a new Transfer where the field 'url' has been updated with the value passed as parameter.
-     *
-     * @param string $url
-     * @return Transfer
-     */
-    public abstract function withUrl($url);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'createdTime' has been updated with the value passed as parameter.
-     *
-     * @param UTCDateTime $createdTime
-     * @return Transfer
-     */
-    public abstract function withCreatedTime(UTCDateTime $createdTime);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'h1Descriptor' has been updated with the value passed as parameter.
-     *
-     * @param H1Descriptor $h1Descriptor
-     * @return Transfer
-     */
-    public abstract function withH1Descriptor(H1Descriptor $h1Descriptor);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'origin' has been updated with the value passed as parameter.
-     *
-     * @param MoneyAccount $origin
-     * @return Transfer
-     */
-    public abstract function withOrigin(MoneyAccount $origin);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'destination' has been updated with the value passed as parameter.
-     *
-     * @param TransferDestination $destination
-     * @return Transfer
-     */
-    public abstract function withDestination(TransferDestination $destination);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'fees' has been updated with the value passed as parameter.
-     *
-     * @param Fees $fees
-     * @return Transfer
-     */
-    public abstract function withFees(Fees $fees);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'sending' has been updated with the value passed as parameter.
-     *
-     * @param Sending $sending
-     * @return Transfer
-     */
-    public abstract function withSending(Sending $sending);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'description' has been updated with the value passed as parameter.
-     *
-     * @param string | null $description
-     * @return Transfer
-     */
-    public abstract function withDescription($description);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'foreignId' has been updated with the value passed as parameter.
-     *
-     * @param string | null $foreignId
-     * @return Transfer
-     */
-    public abstract function withForeignId($foreignId);
-
-    /**
-     * Immutable update. Return a new Transfer where the field 'foreignData' has been updated with the value passed as parameter.
-     *
-     * @param string | null $foreignData
-     * @return Transfer
-     */
-    public abstract function withForeignData($foreignData);
+    public function __toString() {
+        return "Transfer{id=" . $this->id .
+                        ", url=" . $this->url .
+                        ", creator=" . $this->creator .
+                        ", createdTime=" . $this->createdTime .
+                        ", completedTime=" . $this->completedTime .
+                        ", h1Descriptor=" . $this->h1Descriptor .
+                        ", sending=" . $this->sending .
+                        ", source=" . $this->source .
+                        ", destination=" . $this->destination .
+                        ", fees=" . $this->fees .
+                        ", attempt=" . $this->attempt .
+                        ", amount=" . $this->amount .
+                        ", status=" . $this->status .
+                        ", description=" . $this->description .
+                        ", foreignId=" . $this->foreignId .
+                        ", foreignData=" . $this->foreignData . "}";
+    }
 }

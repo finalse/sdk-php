@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -31,34 +31,45 @@ class TransactionService {
     }
 
     /**
-     * Get Transaction
+     * ListAll Transaction
      *
-     * @param string $id
-     * @return Transaction
+     * @param Page $page
+     * @return RestCollection
      */
-    public function get($id) {
-        return Http::Get("/" . Sdk::VERSION . "/transactions/" . $id, "", array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
+    public function fetchPage(Page $page) {
+        if($page == null) throw new \Exception("The page passed in argument is null. Hint:  Verify with collection->hasNextPage() first before calling this function.");
+        return Http::ListAll("/" . Sdk::VERSION . "/transactions", $page->getQueryString(), array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
     }
 
     /**
-     * List Transaction
+     * Get Transaction
      *
-     * @param ListForm $form
+     * @param string $form
+     * @return Transaction
+     */
+    public function get($form) {
+        return Http::Get("/" . Sdk::VERSION . "/transactions/" . $form, "", array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
+    }
+
+    /**
+     * ListAll Transaction
+     *
+     * @param mixed $form
      * @return RestCollection
      */
-    public function listAll(ListForm $form = null) {
-        $qs = $form == null ? ListForm::None()->toQueryString() : $form->toQueryString();
+    public function listAll($form = null) {
+        $qs = $form == null ? ListForm::None()->toQueryString() : ListForm::fromArray($form)->toQueryString();
         return Http::ListAll("/" . Sdk::VERSION . "/transactions", $qs, array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
     }
 
     /**
      * Update Transaction
      *
-     * @param UpdateTransactionForm $form
+     * @param mixed $form
      * @return Transaction
      */
-    public function update(UpdateTransactionForm $form) {
-        return Http::Patch("/" . Sdk::VERSION . "/transactions/" . $form->getId(), $form->toJson(), "", array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
+    public function update($form) {
+        return Http::Patch("/" . Sdk::VERSION . "/transactions/" . $form['id'], json_encode($form), "", array(), function($value){ return Transaction::fromArray($value); }, $this->auth);
     }
 
     public function __toString() {

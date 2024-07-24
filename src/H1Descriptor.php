@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,26 +18,71 @@
 
 use JsonSerializable;
 
-abstract class H1Descriptor implements JsonSerializable  {
+class H1Descriptor implements JsonSerializable  {
+
+    /** @var string | null */
+    protected $fr ;
+
+    /** @var string | null */
+    protected $en ;
 
 
-    /** @return string */
-    public abstract function getType(); 
+    /** @var string */
+    const Type = "H1Descriptor";
 
-    public function isSingleLang() {
-        return $this->getType() === H1DescriptorSingleLang::Type;
+    /**
+     * H1Descriptor constructor
+     * @param string | null $fr
+     * @param string | null $en
+     */
+    function __construct($fr = null, $en = null) {
+        $this->fr = $fr;
+        $this->en = $en;
     }
 
-    public function isMultiLang() {
-        return $this->getType() === H1DescriptorMultiLang::Type;
+    /**
+     * Getter of the field 'fr'.
+     *
+     * @return string | null
+     */
+    public function getFr() {
+        return $this->fr;
     }
 
-    public function isNotSingleLang() {
-        return $this->getType() !== H1DescriptorSingleLang::Type; 
+    /**
+     * Getter of the field 'en'.
+     *
+     * @return string | null
+     */
+    public function getEn() {
+        return $this->en;
     }
 
-    public function isNotMultiLang() {
-        return $this->getType() !== H1DescriptorMultiLang::Type; 
+    /**
+     * Return the type of this Object.
+     *
+     * @return string
+     */
+    public function getType() { return self::Type; } 
+
+    /**
+     * Immutable update. Return a new H1Descriptor where the field 'fr' has been updated with the value passed as parameter.
+     *
+     * @param string | null $fr
+     * @return H1Descriptor
+     */
+    public function withFr($fr) {
+        return new H1Descriptor($fr, $this->en);
+    }
+
+    /**
+     * Immutable update. Return a new H1Descriptor where the field 'en' has been updated with the value passed as parameter.
+     *
+     * @param string | null $en
+     * @return H1Descriptor
+     */
+    public function withEn($en) {
+        return new H1Descriptor($this->fr, $en);
     }
 
     /**
@@ -58,10 +103,8 @@ abstract class H1Descriptor implements JsonSerializable  {
      * @return H1Descriptor
      */
     public static function fromArray(array $array) {
-        $type = $array['_type'];
-        if($type === H1DescriptorSingleLang::Type || str_ends_with('.' . $type, '.' . H1DescriptorSingleLang::Variant)) return H1DescriptorSingleLang::fromArray($array);
-        else if($type === H1DescriptorMultiLang::Type || str_ends_with('.' . $type, '.' . H1DescriptorMultiLang::Variant)) return H1DescriptorMultiLang::fromArray($array);
-        else throw new \InvalidArgumentException("Invalid associative array submitted for creating 'H1Descriptor'" . " Unexpected '_type' = " . $type);
+        return new H1Descriptor((isset($array['fr']) ? $array['fr'] : null),
+                                (isset($array['en']) ? $array['en'] : null));
     }
 
     /**
@@ -80,5 +123,25 @@ abstract class H1Descriptor implements JsonSerializable  {
      */
     public function toJson() {
         return $this->jsonSerialize();
+    }
+
+    /**
+     * Return associative array representing this object
+     *
+     * @return array
+     */
+    public function toArray() {
+        return array_filter(
+            array(
+                'fr' => $this->fr,
+                'en' => $this->en,
+            )
+            , function ($v) { return $v !== null; }
+        );
+    }
+
+    public function __toString() {
+        return "H1Descriptor{fr=" . $this->fr .
+                            ", en=" . $this->en . "}";
     }
 }

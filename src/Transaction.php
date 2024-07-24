@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,11 +29,20 @@ class Transaction implements JsonSerializable  {
     /** @var UTCDateTime */
     protected $createdTime ;
 
-    /** @var string */
+    /** @var H1 */
     protected $h1 ;
 
+    /** @var TransactionDetails */
+    protected $details ;
+
+    /** @var Dc */
+    protected $dc ;
+
+    /** @var TransactionParent */
+    protected $parent ;
+
     /** @var MoneyAccount */
-    protected $origin ;
+    protected $source ;
 
     /** @var MoneyAccount */
     protected $destination ;
@@ -41,17 +50,14 @@ class Transaction implements JsonSerializable  {
     /** @var Amount */
     protected $amount ;
 
-    /** @var TransactionSign */
-    protected $sign ;
-
     /** @var TransactionStatus */
     protected $status ;
 
-    /** @var string | null */
-    protected $description ;
+    /** @var TransactionWalletView */
+    protected $wallet ;
 
     /** @var string | null */
-    protected $foreignId ;
+    protected $description ;
 
     /** @var string | null */
     protected $foreignData ;
@@ -65,39 +71,45 @@ class Transaction implements JsonSerializable  {
      * @param string $id
      * @param string $url
      * @param UTCDateTime $createdTime
-     * @param string $h1
-     * @param MoneyAccount $origin
+     * @param H1 $h1
+     * @param TransactionDetails $details
+     * @param Dc $dc
+     * @param TransactionParent $parent
+     * @param MoneyAccount $source
      * @param MoneyAccount $destination
      * @param Amount $amount
-     * @param TransactionSign $sign
      * @param TransactionStatus $status
+     * @param TransactionWalletView $wallet
      * @param string | null $description
-     * @param string | null $foreignId
      * @param string | null $foreignData
      */
     function __construct($id,
                          $url,
                          UTCDateTime $createdTime,
-                         $h1,
-                         MoneyAccount $origin,
+                         H1 $h1,
+                         TransactionDetails $details,
+                         Dc $dc,
+                         TransactionParent $parent,
+                         MoneyAccount $source,
                          MoneyAccount $destination,
                          Amount $amount,
-                         TransactionSign $sign,
                          TransactionStatus $status,
+                         TransactionWalletView $wallet,
                          $description = null,
-                         $foreignId = null,
                          $foreignData = null) {
         $this->id = $id;
         $this->url = $url;
         $this->createdTime = $createdTime;
         $this->h1 = $h1;
-        $this->origin = $origin;
+        $this->details = $details;
+        $this->dc = $dc;
+        $this->parent = $parent;
+        $this->source = $source;
         $this->destination = $destination;
         $this->amount = $amount;
-        $this->sign = $sign;
         $this->status = $status;
+        $this->wallet = $wallet;
         $this->description = $description;
-        $this->foreignId = $foreignId;
         $this->foreignData = $foreignData;
     }
 
@@ -131,19 +143,46 @@ class Transaction implements JsonSerializable  {
     /**
      * Getter of the field 'h1'.
      *
-     * @return string
+     * @return H1
      */
     public function getH1() {
         return $this->h1;
     }
 
     /**
-     * Getter of the field 'origin'.
+     * Getter of the field 'details'.
+     *
+     * @return TransactionDetails
+     */
+    public function getDetails() {
+        return $this->details;
+    }
+
+    /**
+     * Getter of the field 'dc'.
+     *
+     * @return Dc
+     */
+    public function getDc() {
+        return $this->dc;
+    }
+
+    /**
+     * Getter of the field 'parent'.
+     *
+     * @return TransactionParent
+     */
+    public function getParent() {
+        return $this->parent;
+    }
+
+    /**
+     * Getter of the field 'source'.
      *
      * @return MoneyAccount
      */
-    public function getOrigin() {
-        return $this->origin;
+    public function getSource() {
+        return $this->source;
     }
 
     /**
@@ -165,15 +204,6 @@ class Transaction implements JsonSerializable  {
     }
 
     /**
-     * Getter of the field 'sign'.
-     *
-     * @return TransactionSign
-     */
-    public function getSign() {
-        return $this->sign;
-    }
-
-    /**
      * Getter of the field 'status'.
      *
      * @return TransactionStatus
@@ -183,21 +213,21 @@ class Transaction implements JsonSerializable  {
     }
 
     /**
+     * Getter of the field 'wallet'.
+     *
+     * @return TransactionWalletView
+     */
+    public function getWallet() {
+        return $this->wallet;
+    }
+
+    /**
      * Getter of the field 'description'.
      *
      * @return string | null
      */
     public function getDescription() {
         return $this->description;
-    }
-
-    /**
-     * Getter of the field 'foreignId'.
-     *
-     * @return string | null
-     */
-    public function getForeignId() {
-        return $this->foreignId;
     }
 
     /**
@@ -223,9 +253,10 @@ class Transaction implements JsonSerializable  {
      * @return Transaction
      */
     public function withId($id) {
-        return new Transaction($id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $this->foreignData);
+        return new Transaction($id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
@@ -235,9 +266,10 @@ class Transaction implements JsonSerializable  {
      * @return Transaction
      */
     public function withUrl($url) {
-        return new Transaction($this->id, $url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $this->foreignData);
+        return new Transaction($this->id, $url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
@@ -248,34 +280,77 @@ class Transaction implements JsonSerializable  {
      */
     public function withCreatedTime(UTCDateTime $createdTime) {
         assert($this->createdTime != null, "In class Transaction the param 'createdTime' of type UTCDateTime can not be null");
-        return new Transaction($this->id, $this->url, $createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $this->foreignData);
+        return new Transaction($this->id, $this->url, $createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
      * Immutable update. Return a new Transaction where the field 'h1' has been updated with the value passed as parameter.
      *
-     * @param string $h1
+     * @param H1 $h1
      * @return Transaction
      */
-    public function withH1($h1) {
-        return new Transaction($this->id, $this->url, $this->createdTime, $h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $this->foreignData);
+    public function withH1(H1 $h1) {
+        assert($this->h1 != null, "In class Transaction the param 'h1' of type H1 can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
-     * Immutable update. Return a new Transaction where the field 'origin' has been updated with the value passed as parameter.
+     * Immutable update. Return a new Transaction where the field 'details' has been updated with the value passed as parameter.
      *
-     * @param MoneyAccount $origin
+     * @param TransactionDetails $details
      * @return Transaction
      */
-    public function withOrigin(MoneyAccount $origin) {
-        assert($this->origin != null, "In class Transaction the param 'origin' of type MoneyAccount can not be null");
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $this->foreignData);
+    public function withDetails(TransactionDetails $details) {
+        assert($this->details != null, "In class Transaction the param 'details' of type TransactionDetails can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transaction where the field 'dc' has been updated with the value passed as parameter.
+     *
+     * @param Dc $dc
+     * @return Transaction
+     */
+    public function withDc(Dc $dc) {
+        assert($this->dc != null, "In class Transaction the param 'dc' of type Dc can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $dc, $this->parent, $this->source, $this->destination, $this->amount,
+                               $this->status, $this->wallet, $this->description, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transaction where the field 'parent' has been updated with the value passed as parameter.
+     *
+     * @param TransactionParent $parent
+     * @return Transaction
+     */
+    public function withParent(TransactionParent $parent) {
+        assert($this->parent != null, "In class Transaction the param 'parent' of type TransactionParent can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $parent, $this->source, $this->destination, $this->amount,
+                               $this->status, $this->wallet, $this->description, $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transaction where the field 'source' has been updated with the value passed as parameter.
+     *
+     * @param MoneyAccount $source
+     * @return Transaction
+     */
+    public function withSource(MoneyAccount $source) {
+        assert($this->source != null, "In class Transaction the param 'source' of type MoneyAccount can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $source, $this->destination, $this->amount,
+                               $this->status, $this->wallet, $this->description, $this->foreignData);
     }
 
     /**
@@ -286,9 +361,9 @@ class Transaction implements JsonSerializable  {
      */
     public function withDestination(MoneyAccount $destination) {
         assert($this->destination != null, "In class Transaction the param 'destination' of type MoneyAccount can not be null");
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $destination, $this->amount, $this->sign, $this->status, $this->description,
-                               $this->foreignId, $this->foreignData);
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $destination, $this->amount,
+                               $this->status, $this->wallet, $this->description, $this->foreignData);
     }
 
     /**
@@ -299,22 +374,10 @@ class Transaction implements JsonSerializable  {
      */
     public function withAmount(Amount $amount) {
         assert($this->amount != null, "In class Transaction the param 'amount' of type Amount can not be null");
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $amount, $this->sign, $this->status, $this->description,
-                               $this->foreignId, $this->foreignData);
-    }
-
-    /**
-     * Immutable update. Return a new Transaction where the field 'sign' has been updated with the value passed as parameter.
-     *
-     * @param TransactionSign $sign
-     * @return Transaction
-     */
-    public function withSign(TransactionSign $sign) {
-        assert($this->sign != null, "In class Transaction the param 'sign' of type TransactionSign can not be null");
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $sign, $this->status, $this->description,
-                               $this->foreignId, $this->foreignData);
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $amount, $this->status, $this->wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
@@ -325,9 +388,24 @@ class Transaction implements JsonSerializable  {
      */
     public function withStatus(TransactionStatus $status) {
         assert($this->status != null, "In class Transaction the param 'status' of type TransactionStatus can not be null");
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $status, $this->description,
-                               $this->foreignId, $this->foreignData);
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $status, $this->wallet, $this->description,
+                               $this->foreignData);
+    }
+
+    /**
+     * Immutable update. Return a new Transaction where the field 'wallet' has been updated with the value passed as parameter.
+     *
+     * @param TransactionWalletView $wallet
+     * @return Transaction
+     */
+    public function withWallet(TransactionWalletView $wallet) {
+        assert($this->wallet != null, "In class Transaction the param 'wallet' of type TransactionWalletView can not be null");
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $wallet, $this->description,
+                               $this->foreignData);
     }
 
     /**
@@ -337,21 +415,10 @@ class Transaction implements JsonSerializable  {
      * @return Transaction
      */
     public function withDescription($description) {
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $description, $this->foreignId, $this->foreignData);
-    }
-
-    /**
-     * Immutable update. Return a new Transaction where the field 'foreignId' has been updated with the value passed as parameter.
-     *
-     * @param string | null $foreignId
-     * @return Transaction
-     */
-    public function withForeignId($foreignId) {
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $foreignId, $this->foreignData);
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $description,
+                               $this->foreignData);
     }
 
     /**
@@ -361,9 +428,10 @@ class Transaction implements JsonSerializable  {
      * @return Transaction
      */
     public function withForeignData($foreignData) {
-        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->origin,
-                               $this->destination, $this->amount, $this->sign, $this->status,
-                               $this->description, $this->foreignId, $foreignData);
+        return new Transaction($this->id, $this->url, $this->createdTime, $this->h1, $this->details,
+                               $this->dc, $this->parent, $this->source, $this->destination,
+                               $this->amount, $this->status, $this->wallet, $this->description,
+                               $foreignData);
     }
 
     /**
@@ -387,14 +455,16 @@ class Transaction implements JsonSerializable  {
         return new Transaction($array['id'],
                                $array['url'],
                                UTCDateTime::fromArray($array['createdTime']),
-                               $array['h1'],
-                               MoneyAccount::fromArray($array['origin']),
+                               H1::fromArray($array['h1']),
+                               TransactionDetails::fromArray($array['details']),
+                               Dc::fromString($array['dc']),
+                               TransactionParent::fromArray($array['parent']),
+                               MoneyAccount::fromArray($array['source']),
                                MoneyAccount::fromArray($array['destination']),
                                Amount::fromArray($array['amount']),
-                               TransactionSign::fromString($array['sign']),
-                               TransactionStatus::fromString($array['status']),
+                               TransactionStatus::fromArray($array['status']),
+                               TransactionWalletView::fromArray($array['wallet']),
                                (isset($array['description']) ? $array['description'] : null),
-                               (isset($array['foreignId']) ? $array['foreignId'] : null),
                                (isset($array['foreignData']) ? $array['foreignData'] : null));
     }
 
@@ -427,14 +497,16 @@ class Transaction implements JsonSerializable  {
                 'id' => $this->id,
                 'url' => $this->url,
                 'createdTime' => ($this->createdTime !== null ? $this->createdTime->toArray() : null),
-                'h1' => $this->h1,
-                'origin' => ($this->origin !== null ? $this->origin->toArray() : null),
+                'h1' => ($this->h1 !== null ? $this->h1->toArray() : null),
+                'details' => ($this->details !== null ? $this->details->toArray() : null),
+                'dc' => ((string) $this->dc),
+                'parent' => ($this->parent !== null ? $this->parent->toArray() : null),
+                'source' => ($this->source !== null ? $this->source->toArray() : null),
                 'destination' => ($this->destination !== null ? $this->destination->toArray() : null),
                 'amount' => ($this->amount !== null ? $this->amount->toArray() : null),
-                'sign' => ((string) $this->sign),
-                'status' => ((string) $this->status),
+                'status' => ($this->status !== null ? $this->status->toArray() : null),
+                'wallet' => ($this->wallet !== null ? $this->wallet->toArray() : null),
                 'description' => $this->description,
-                'foreignId' => $this->foreignId,
                 'foreignData' => $this->foreignData,
             )
             , function ($v) { return $v !== null; }
@@ -446,13 +518,15 @@ class Transaction implements JsonSerializable  {
                            ", url=" . $this->url .
                            ", createdTime=" . $this->createdTime .
                            ", h1=" . $this->h1 .
-                           ", origin=" . $this->origin .
+                           ", details=" . $this->details .
+                           ", dc=" . $this->dc .
+                           ", parent=" . $this->parent .
+                           ", source=" . $this->source .
                            ", destination=" . $this->destination .
                            ", amount=" . $this->amount .
-                           ", sign=" . $this->sign .
                            ", status=" . $this->status .
+                           ", wallet=" . $this->wallet .
                            ", description=" . $this->description .
-                           ", foreignId=" . $this->foreignId .
                            ", foreignData=" . $this->foreignData . "}";
     }
 }

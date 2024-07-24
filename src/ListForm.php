@@ -1,6 +1,6 @@
 <?php namespace Finalse\Sdk;
 /*
-   Copyright © 2023 Finalse Cloud
+   Copyright © 2024 Finalse Cloud
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ use JsonSerializable;
 class ListForm implements JsonSerializable  {
 
     /** @var string | null */
-    private $where ;
+    private $filter ;
 
     /** @var integer | null */
     private $limit ;
 
     /** @var string | null */
-    private $orderBy ;
+    private $sortBy ;
 
 
     /** @var string */
@@ -34,23 +34,23 @@ class ListForm implements JsonSerializable  {
 
     /**
      * ListForm constructor
-     * @param string | null $where
+     * @param string | null $filter
      * @param integer | null $limit
-     * @param string | null $orderBy
+     * @param string | null $sortBy
      */
-    function __construct($where = null, $limit = null, $orderBy = null) {
-        $this->where = $where;
+    function __construct($filter = null, $limit = null, $sortBy = null) {
+        $this->filter = $filter;
         $this->limit = $limit;
-        $this->orderBy = $orderBy;
+        $this->sortBy = $sortBy;
     }
 
     /**
-     * Getter of the field 'where'.
+     * Getter of the field 'filter'.
      *
      * @return string | null
      */
-    public function getWhere() {
-        return $this->where;
+    public function getFilter() {
+        return $this->filter;
     }
 
     /**
@@ -63,12 +63,12 @@ class ListForm implements JsonSerializable  {
     }
 
     /**
-     * Getter of the field 'orderBy'.
+     * Getter of the field 'sortBy'.
      *
      * @return string | null
      */
-    public function getOrderBy() {
-        return $this->orderBy;
+    public function getSortBy() {
+        return $this->sortBy;
     }
 
     /**
@@ -79,33 +79,33 @@ class ListForm implements JsonSerializable  {
     public function getType() { return self::Type; }
 
     /**
-     * Immutable update. Return a new ListForm where the field 'where' has been updated with the value passed as parameter.
+     * Immutable update. Return a new ListForm filter the field 'filter' has been updated with the value passed as parameter.
      *
-     * @param string | null $where
+     * @param string | null $filter
      * @return ListForm
      */
-    public function withWhere($where) {
-        return new ListForm($where, $this->limit, $this->orderBy);
+    public function withFilter($filter) {
+        return new ListForm($filter, $this->limit, $this->sortBy);
     }
 
     /**
-     * Immutable update. Return a new ListForm where the field 'limit' has been updated with the value passed as parameter.
+     * Immutable update. Return a new ListForm filter the field 'limit' has been updated with the value passed as parameter.
      *
      * @param integer | null $limit
      * @return ListForm
      */
     public function withLimit($limit) {
-        return new ListForm($this->where, $limit, $this->orderBy);
+        return new ListForm($this->filter, $limit, $this->sortBy);
     }
 
     /**
-     * Immutable update. Return a new ListForm where the field 'orderBy' has been updated with the value passed as parameter.
+     * Immutable update. Return a new ListForm filter the field 'sortBy' has been updated with the value passed as parameter.
      *
-     * @param string | null $orderBy
+     * @param string | null $sortBy
      * @return ListForm
      */
-    public function withOrderBy($orderBy) {
-        return new ListForm($this->where, $this->limit, $orderBy);
+    public function withSortBy($sortBy) {
+        return new ListForm($this->filter, $this->limit, $sortBy);
     }
 
     /**
@@ -126,9 +126,10 @@ class ListForm implements JsonSerializable  {
      * @return ListForm
      */
     public static function fromArray(array $array) {
-        return new ListForm((isset($array['where']) ? $array['where'] : null),
+        return new ListForm(
+            (isset($array['filter']) ? $array['filter'] : null),
             (isset($array['limit']) ? $array['limit'] : null),
-            (isset($array['orderBy']) ? $array['orderBy'] : null));
+            (isset($array['sortBy']) ? $array['sortBy'] : null));
     }
 
     /**
@@ -164,14 +165,14 @@ class ListForm implements JsonSerializable  {
     }
 
     public function toQueryString() {
-        return ($this->where == null && $this->limit == null && $this->orderBy == null
+        return ($this->filter == null && $this->limit == null && $this->sortBy == null
             ? ""
             : "?" . http_build_query(get_object_vars($this)));
     }
 
     public function __toString() {
-        return "ListForm{where=" . $this->where .
+        return "ListForm{filter=" . $this->filter .
             ", limit=" . $this->limit .
-            ", orderBy=" . $this->orderBy . "}";
+            ", sortBy=" . $this->sortBy . "}";
     }
 }
